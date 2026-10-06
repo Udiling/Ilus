@@ -1,0 +1,20 @@
+# Export day: 2026-08-08
+
+## SUMMARY
+Gross (items excl. cancelled): 1950.00
+Cancelled items: 0
+Paid total: 0.00
+Tips total: 0.00
+
+## ITEMS
+ORD-093544	14	105	Водка. царская золотая	1	400.0	new	2026-08-08 06:35:44
+ORD-093544	14	113	Алазанская долина. красное полусладкое	1	150.0	new	2026-08-08 06:35:44
+ORD-093544	14	114	Шампанское. Абрау‑Дюрсо. полусладкое	1	1400.0	new	2026-08-08 06:35:44
+
+## PAYMENTS
+
+## TIPS
+
+## DISCOUNTS
+
+## EVENTS

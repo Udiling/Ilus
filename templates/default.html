@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ru" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Касса Кафе — Оффлайн</title>
+  <style>
+    :root { --bg: #f4f6f8; --panel: #ffffff; --accent: #0a58ca; --text: #212529; --border: #dee2e6; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 20px; background: var(--bg); color: var(--text); }
+    .panel { background: var(--panel); padding: 20px; margin-bottom: 16px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .hidden { display: none !important; }
+    button { padding: 10px 18px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+    button:hover { background: #084298; }
+    button:disabled { background: #adb5bd; cursor: not-allowed; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: #f8f9fa; font-weight: 600; }
+    .qr-box { max-width: 420px; margin: 40px auto; text-align: center; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .menu-item { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
+    .menu-item:hover, .menu-item.active { border-color: var(--accent); background: #e7f1ff; }
+    .cart-list { list-style: none; padding: 0; margin: 10px 0; }
+    .cart-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+    .receipt { font-family: "Courier New", monospace; max-width: 320px; margin: 20px auto; padding: 16px; border: 1px dashed #888; background: #fff; line-height: 1.4; }
+    @media print { .no-print { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="auth-section" class="panel qr-box">
+      <h2>Авторизация оператора</h2>
+      <p class="no-print">Сканируйте QR-код или введите строку: <strong>QR|ID|роль|шаблон</strong></p>
+      <p class="no-print" style="font-size:13px;color:#6c757d;margin-top:0">
+        ID — числовой код оператора из справочника (касса: 31–40, гость: 1–25).<br>
+        Пример кассира: <code>QR|31|staff|default</code>. Страница должна быть открыта через <code>http://localhost:8080/</code>.
+      </p>
+      <input type="text" id="qr-input" placeholder="QR|31|staff|default">
+      <button id="auth-btn">Войти</button>
+      <p id="auth-status" style="margin-top:10px; color:#6c757d;">Ожидание сканирования...</p>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div id="top-bar" class="panel no-print">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong>Смена:</strong> <span id="user-name">—</span> <span id="user-role">(—)</span>
+          </div>
+          <div>
+            <button onclick="showTab('orders')">Заказы</button>
+            <button onclick="showTab('pickup')">Очередь выдачи</button>
+            <button onclick="showTab('ledger')">Проводки</button>
+            <button onclick="showTab('resv')" style="background:#6f42c1">Бронь/Заказ</button>
+            <button onclick="logout()">Выйти</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="resv-section" class="panel hidden">
+        <h3>Заказ по брони</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="date" id="resv-c-day" style="width:auto">
+          <input type="text" id="resv-c-q" placeholder="телефон / имя / № брони" style="width:220px">
+          <button onclick="cashierResvLoad()">Найти</button>
+        </div>
+        <div id="resv-c-list" style="margin-top:10px;font-size:14px"></div>
+      </div>
+
+      <div id="orders-section" class="panel">
+        <h3>Меню</h3>
+        <div id="menu-container" class="menu-grid"></div>
+        <div style="margin-top:20px; border-top:2px solid var(--border); padding-top:15px;">
+          <h4>Корзина</h4>
+          <ul id="cart-list" class="cart-list"></ul>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Итого: <span id="cart-total">0</span> ₽</strong>
+            <button id="checkout-btn" disabled>Оформить чек</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pickup-section" class="panel hidden">
+        <h3>Очередь выдачи — <span id="pickup-point-label">Бар</span></h3>
+        <p style="color:#6c757d;font-size:13px;margin-top:0">Готовые позиции (status: ready) для вашей точки выдачи</p>
+        <table id="pickup-table">
+          <thead><tr><th>Заказ</th><th>Стол</th><th>Позиция</th><th>К-во</th><th>Точка</th><th>Действие</th></tr></thead>
+          <tbody><tr><td colspan="6" style="text-align:center;padding:20px;color:#6c757d">Загрузка...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div id="ledger-section" class="panel hidden">
+        <h3>Журнал проводок</h3>
+        <div class="no-print" style="display:flex; gap:10px; margin-bottom:15px;">
+          <button onclick="alert('Экспорт пока не подключен')">Экспорт CSV</button>
+          <button onclick="alert('Импорт пока не подключен')">Импорт CSV</button>
+        </div>
+        <table id="ledger-table">
+          <thead><tr><th>Референс</th><th>Заказ</th><th>Табель</th><th>Сумма</th><th>Дата</th></tr></thead>
+          <tbody><!-- Данные --></tbody>
+        </table>
+      </div></div>
+	  
+  <!-- Панель: печать/уведомления -->
+  <div id="print-tools" class="panel hidden" style="max-width:900px; margin:14px auto; background:#fff; padding:12px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.08)">
+    <h3 style="margin:0 0 8px">Печать / Уведомления</h3>
+    <div style="display:flex; gap:10px; flex-wrap:wrap">
+      <button onclick="queuePrint('bar')" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🖨 Печать (Бар)</button>
+      <button onclick="queuePrint('kitchen')" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🖨 Печать (Кухня)</button>
+      <button onclick="queuePrint('client')" style="background:#198754;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📱 Уведомить клиента</button>
+    </div>
+    <div id="print-status" style="margin-top:6px;color:#6c757d"></div>
+  </div>
+
+  <!-- Модалка быстрых причин -->
+  <div id="qr-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999">
+    <div style="background:#fff;padding:16px;border-radius:10px;min-width:320px;max-width:520px;box-shadow:0 8px 18px rgba(0,0,0,.2)">
+      <h3 style="margin:0 0 10px">Быстрые причины</h3>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <select id="qr-kind-sel" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+          <option value="cancel">cancel</option>
+          <option value="edit">edit</option>
+          <option value="discount">discount</option>
+        </select>
+        <button onclick="qrLoadList()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🔄 Обновить</button>
+      </div>
+      <div id="qr-box" style="max-height:220px;overflow:auto;border:1px solid #eee;border-radius:8px;padding:8px;background:#f8f9fa">—</div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <textarea id="qr-picked" rows="2" placeholder="Выбранная причина" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px"></textarea>
+        <button onclick="qrCopyClose()" style="background:#198754;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📋 Скопировать и закрыть</button>
+        <button onclick="qrClose()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">✖ Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // Открыть модалку (director)
+  function qrOpen(kind){
+    const k = (kind||'cancel');
+    const sel = document.getElementById('qr-kind-sel');
+    if (sel) sel.value = k;
+    document.getElementById('qr-overlay').style.display='flex';
+    qrLoadList();
+    document.getElementById('qr-picked').value='';
+  }
+
+  // Загрузить список по выбранному kind и отрисовать
+  function qrLoadList(){
+    const k = document.getElementById('qr-kind-sel').value.trim();
+    fetch('/api/reasons/quick/list?kind='+encodeURIComponent(k))
+      .then(r => r.json())
+      .then(list => {
+        const box = document.getElementById('qr-box');
+        if (!Array.isArray(list) || !list.length){
+          box.innerHTML = '—';
+          return;
+        }
+        let out = '';
+        list.sort((a,b)=>(a.code > b.code ? 1 : -1)).forEach(r => {
+          out += `<div style="margin:4px 0;display:flex;gap:8px;align-items:center">
+                    <button onclick="qrPick('${(r.title||'').replace(/'/g, '\\')}')" style="background:#0d6efd;color:#fff;border:none;padding:4px 8px;border-radius:6px;cursor:pointer">Выбрать</button>
+                    <span style="font-family:monospace;color:#495057">${r.code} - ${r.title}</span></div>`;
+        });
+        box.innerHTML = out;
+      })
+      .catch(e => { document.getElementById('qr-box').innerHTML = 'Ошибка: '+e.message; });
+  }
+
+  // Выбрать причину
+  function qrPick(txt){
+    document.getElementById('qr-picked').value = txt || '';
+    try { window.quickReason = txt || ''; } catch(e) {}
+  }
+
+  // Скопировать и закрыть
+  function qrCopyClose(){
+    const v = document.getElementById('qr-picked').value || '';
+    if (!v){ qrClose(); return; }
+    navigator.clipboard?.writeText(v).then(()=>{}).catch(()=>{});
+    try { window.quickReason = v; } catch(e) {}
+    qrClose();
+  }
+
+  // Закрыть модалку
+  function qrClose(){
+    document.getElementById('qr-overlay').style.display='none';
+  }
+  </script>
+
+  <script>
+  function queuePrint(target){
+    if(!window.currentOrderId){ alert('Нет активного заказа'); return; }
+    // Базовый payload — печатная утилита по order_id сама подтянет состав
+    const payload = {
+      order_id: window.currentOrderId,
+      ts: new Date().toISOString(),
+      meta: { cashier: (window.currentOperId||'cashier') }
+    };
+    const fd = new FormData();
+    fd.append('target', target);
+    fd.append('payload_json', JSON.stringify(payload));
+    fetch('/api/print/queue',{method:'POST', body:fd})
+      .then(r=>r.json())
+      .then(d=>{
+        const el = document.getElementById('print-status');
+        if(d.status==='queued') el.textContent = `В очередь [${target}] → #${d.id}`;
+        else el.textContent = 'Ошибка очереди: ' + (d.detail || JSON.stringify(d));
+      })
+      .catch(e=> alert('Ошибка сети: ' + e.message));
+  }
+  // Показывать панель печати вместе с кассой:
+  if(typeof showCashTools==='function'){
+    const _origShow = showCashTools;
+    window.showCashTools = function(oid){
+      _origShow(oid);
+      document.getElementById('print-tools')?.classList.remove('hidden');
+    };
+  }
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('auth-btn');
+    const statusEl = document.getElementById('auth-status');
+    const inputEl = document.getElementById('qr-input');
+    if (!btn || !statusEl || !inputEl) return;
+
+    function sanitizeQrInput(raw) {
+      let s = (raw || '').trim();
+      // Убрать хвостовую пунктуацию от сканера (напр. QR|31|staff|default!)
+      s = s.replace(/[!.,;:\s]+$/, '');
+      return s;
+    }
+
+    btn.addEventListener('click', async () => {
+      const val = sanitizeQrInput(inputEl.value);
+      if (!val) { statusEl.textContent = 'Введите строку QR'; return; }
+      if (val !== inputEl.value.trim()) inputEl.value = val;
+      statusEl.textContent = 'Проверка...';
+      try {
+        const url = `/api/scan_qr?scan_data=${encodeURIComponent(val)}`;
+        const res = await fetch(url);
+        let data;
+        try {
+          data = await res.json();
+        } catch (parseErr) {
+          statusEl.textContent = `Сервер вернул не-JSON (${res.status}). Откройте http://localhost:8080/ и проверьте, что сервер запущен.`;
+          console.error(parseErr);
+          return;
+        }
+        if (!res.ok && !data.error) {
+          statusEl.textContent = `Ошибка сервера (${res.status})`;
+          return;
+        }
+        if (data.success) {
+          statusEl.textContent = `Вход: ${data.operator.name || 'Оператор'} (${data.operator.oper || 'кассир'})`;
+          document.getElementById('auth-section').classList.add('hidden');
+          document.getElementById('dashboard').classList.remove('hidden');
+          document.getElementById('user-name').textContent = data.operator.name || 'Оператор';
+          document.getElementById('user-role').textContent = `(${data.operator.oper || 'кассир'})`;
+          window.currentOperId = data.operator.oper_id;
+          window.operatorPermissions = data.permissions || {};
+          if (window.operatorPermissions.alcohol_banned) {
+            statusEl.textContent += ' · алкоголь запрещён';
+          }
+          if (window.operatorPermissions.discount_pct > 0) {
+            statusEl.textContent += ` · скидка ${window.operatorPermissions.discount_pct}%`;
+          }
+          const pl = window.operatorPermissions.pickup_label || 'Бар';
+          document.getElementById('pickup-point-label').textContent = pl;
+          loadMenu();
+          loadPickupQueue();
+          if (!window._pickupTimer) {
+            window._pickupTimer = setInterval(loadPickupQueue, 3000);
+          }
+          if (typeof startBarReminders === 'function') startBarReminders(data.operator.oper_id);
+        } else if (data.error === 'INVALID_FORMAT') {
+          statusEl.textContent = 'Неверный формат QR. Используйте: QR|ID|роль|шаблон (например QR|31|staff|default).';
+        } else if (data.error === 'OPERATOR_NOT_FOUND') {
+          statusEl.textContent = 'Оператор не найден. Проверьте ID в строке QR (должен быть числом из справочника oper).';
+        } else if (data.error === 'FORM_ACCESS_DENIED') {
+          const allowed = (data.allowed_forms || []).join(', ') || 'нет';
+          statusEl.textContent = `⛔ ${data.detail || 'Доступ запрещён'}. Доступные формы: ${allowed}`;
+        } else {
+          statusEl.textContent = `Ошибка входа: ${data.error || 'Неверные данные'}`;
+        }
+      } catch (e) {
+        const offline = location.protocol === 'file:';
+        statusEl.textContent = offline
+          ? 'Страница открыта как файл. Откройте http://localhost:8080/ в браузере.'
+          : 'Нет связи с сервером. Запустите start_server.bat и откройте http://localhost:8080/';
+        console.error(e);
+      }
+    });
+  });
+
+  async function loadMenu() {
+    try {
+      const op = window.currentOperId || '';
+      const url = op ? `/api/menu?oper_id=${encodeURIComponent(op)}` : '/api/menu';
+      const res = await fetch(url);
+      const items = await res.json();
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        div.innerHTML = `${item.name} ${item.price} ₽`;
+        div.onclick = () => addToCart(item);
+        container.appendChild(div);
+      });
+    } catch (e) { console.error('Меню не загружено', e); }
+  }
+
+  let cart = [];
+  function addToCart(item) {
+    const exist = cart.find(i => i.name_id == item.name_id);
+    if (exist) exist.qty += 1;
+    else cart.push({ ...item, qty: 1 });
+    renderCart();
+  }
+
+  function renderCart() {
+    const list = document.getElementById('cart-list');
+    const totalEl = document.getElementById('cart-total');
+    list.innerHTML = '';
+    let total = 0;
+    cart.forEach(i => {
+      total += i.price * i.qty;
+      const li = document.createElement('li');
+      li.innerHTML = `${i.name} x${i.qty} ${(i.price * i.qty).toFixed(2)} ₽`;
+      list.appendChild(li);
+    });
+    totalEl.textContent = total.toFixed(2);
+    document.getElementById('checkout-btn').disabled = cart.length === 0;
+  }
+
+  document.getElementById('checkout-btn').addEventListener('click', async () => {
+    const fd = new FormData();
+    fd.append('oper_id', window.currentOperId || 'guest');
+    fd.append('table_id', prompt('Номер стола:', '1') || '1');
+    fd.append('items_json', JSON.stringify(cart.map(i => ({ name_id: i.name_id, name: i.name, qty: i.qty, price: i.price }))));
+    try {
+      const res = await fetch('/api/orders/create', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (res.ok) {
+        const pts = (data.pickups || [data.pickup]).map(p => p === 'il_drive' ? 'ОкноГриль' : 'Бар').join(', ');
+        alert(`✅ Заказ ${data.order_id} создан!\nТочка выдачи: ${pts}`);
+        cart = []; renderCart();
+      } else {
+        alert(`❌ Ошибка: ${data.detail}`);
+      }
+    } catch (e) { alert('⚠️ Ошибка сети: ' + e.message); }
+  });
+
+  async function loadPickupQueue() {
+    const op = window.currentOperId;
+    if (!op) return;
+    try {
+      const res = await fetch(`/api/orders/active?oper_id=${encodeURIComponent(op)}`);
+      const data = await res.json();
+      const tb = document.querySelector('#pickup-table tbody');
+      tb.innerHTML = '';
+      if (!data || !data.length) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#6c757d">Нет готовых позиций ✅</td></tr>';
+        return;
+      }
+      data.forEach(row => {
+        if (row.status !== 'ready') return;
+        const pt = row.pickup_point === 'il_drive' ? '🍽 ОкноГриль' : '🍸 Бар';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.order_id}</td>
+          <td>${row.table_id}</td>
+          <td><b>${row.name}</b></td>
+          <td>${row.qty}</td>
+          <td>${pt}</td>
+          <td><button onclick="markPickupServed(${row.id})" style="background:#198754;color:#fff;border:none;padding:6px 12px;border-radius:5px;cursor:pointer">✅ Выдано</button></td>`;
+        tb.appendChild(tr);
+      });
+    } catch (e) { console.error('pickup queue error', e); }
+  }
+
+  window.markPickupServed = async function(itemId) {
+    const fd = new FormData();
+    fd.append('item_id', String(itemId));
+    fd.append('new_status', 'served');
+    fd.append('oper_id', window.currentOperId || '');
+    try {
+      const res = await fetch('/api/orders/status', { method: 'POST', body: fd });
+      if (res.ok) loadPickupQueue();
+      else {
+        const e = await res.json();
+        alert('❌ ' + (e.detail || 'Ошибка'));
+      }
+    } catch (e) { alert('❌ Ошибка сети: ' + e.message); }
+  };
+</script>
+<script>
+// Глобальные переключатели для кнопок в шапке
+window.showTab = function(tabName) {
+  const panels = document.querySelectorAll('#dashboard > .panel');
+  panels.forEach(p => {
+    if (p.id === 'top-bar') return;
+    p.classList.add('hidden');
+  });
+  const target = document.getElementById(tabName + '-section');
+  if (target) target.classList.remove('hidden');
+};
+
+window.logout = function() {
+  location.reload();
+};
+
+// ===== Заказ по брони (касса) =====
+window.cashierResvLoad = function() {
+  const day = document.getElementById('resv-c-day').value || new Date().toISOString().slice(0, 10);
+  const q = (document.getElementById('resv-c-q').value || '').trim().toLowerCase();
+  fetch('/api/reservations?day=' + day)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      const box = document.getElementById('resv-c-list');
+      if (!d) { box.innerHTML = 'Ошибка загрузки'; return; }
+      let items = d.items || [];
+      if (q) items = items.filter(r =>
+        String(r.id) === q ||
+        (r.phone || '').toLowerCase().includes(q) ||
+        (r.guest_name || '').toLowerCase().includes(q));
+      if (!items.length) { box.innerHTML = '<div style="color:#6c757d;padding:8px">Броней не найдено</div>'; return; }
+      box.innerHTML = items.map(r => {
+        const hasOrder = r.order_json && r.order_json !== '[]' && r.order_json !== 'null';
+        const closed = Number(r.is_closed_event) ? ' <b style="color:#dc3545">🔒 ЗАКРЫТОЕ</b>' : '';
+        return `<div style="border-bottom:1px solid #f1f3f5;padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <b>№${r.id}</b> · ${String(r.res_time).slice(0,5)} · Стол ${r.table_id}${closed}
+          · ${(r.guest_name || '')} · ${(r.phone || '')}
+          ${r.guests_count ? ' · гостей: ' + r.guests_count : ''}
+          ${hasOrder ? ` · <a href="#" onclick="cashierResvDetails(${r.id});return false" style="color:#0a58ca">заказ</a>` : ''}
+          ${Number(r.advance_amount) > 0 ? ' · аванс: ' + Number(r.advance_amount).toFixed(2) + ' ₽ (' + (r.advance_method || '—') + ')' : ''}
+          ${hasOrder ? `<button onclick="window.open('/api/reservations/order_pdf?res_id=${r.id}','_blank')" style="background:#dc3545">📄 PDF</button>` : ''}
+        </div>`;
+      }).join('');
+    })
+    .catch(e => document.getElementById('resv-c-list').innerHTML = 'Ошибка: ' + e.message);
+};
+
+window.cashierResvDetails = function(resId) {
+  fetch('/api/reservations/order?res_id=' + resId)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) return alert('Бронь не найдена');
+      let html = 'Гость: ' + (d.guest_name || '') + ' · ' + (d.phone || '') +
+        ' · гостей: ' + (d.guests_count || 0) + '\nИтого: ' + Number(d.total || 0).toFixed(2) + ' ₽' +
+        ' · аванс: ' + Number(d.advance_amount || 0).toFixed(2) + ' ₽ (' + (d.advance_method || '—') + ')\n\n';
+      (d.items || []).forEach(i => html += `${i.name} × ${i.qty} = ${(i.price * i.qty).toFixed(2)} ₽\n`);
+      alert(html);
+    });
+};
+document.getElementById('resv-c-day').value = new Date().toISOString().slice(0, 10);
+
+// Инициализация после полной загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+  // Здесь должен быть ваш существующий код авторизации, меню и корзины.
+  // Убедитесь, что он выше этого блока.
+});
+</script>
+<div id="cash-tools" class="panel hidden" style="max-width:900px; margin:20px auto; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.08)">
+  <h3 style="margin:0 0 10px">Кассовые операции</h3>
+  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:8px">
+    <div>Заказ: <b id="ct-order">—</b></div>
+    <div>Сумма: <b id="ct-total">0</b> ₽</div>
+    <div>Оплачено: <b id="ct-paid">0</b> ₽</div>
+    <div>К оплате: <b id="ct-due" style="color:#d6336c">0</b> ₽</div>
+    <div>Чаевые: <b id="ct-tips">0</b> ₽</div>
+  </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap">
+    <button onclick="payFlow('cash')" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">💵 Оплата (Нал)</button>
+    <button onclick="payFlow('card')" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">💳 Оплата (Карта)</button>
+    <button onclick="payFlow('transfer')" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🏦 Оплата (Перевод)</button>
+    <button onclick="discountFlow()" style="background:#20c997;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🔖 Скидка</button>
+    <button onclick="tipFlow()" style="background:#198754;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">💁 Чаевые</button>
+    <button onclick="cancelItemFlow()" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">❌ Отмена позиции</button>
+    <button onclick="cancelOrderFlow()" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🧨 Отмена заказа</button>
+    <button onclick="splitItemsFlow()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🪓 Сплит (ID)</button>
+    <button onclick="splitQtyFlow()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🪓 Сплит (Qty)</button>
+    <button onclick="settleFlow()" style="background:#845ef7;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">✅ Закрыть заказ</button>
+	<!-- Кнопки для быстрого выбора причин -->
+    <button onclick="qrOpen('cancel')" style="background:#6c757d;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer">📚 Быстрые причины (cancel)</button>
+    <button onclick="qrOpen('discount')" style="background:#6c757d;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer">📚 Быстрые причины (discount)</button>
+    <button onclick="qrOpen('edit')" style="background:#6c757d;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer">📚 Быстрые причины (edit)</button>
+  </div>
+</div>
+<script>
+// Текущий заказ — присваиваем после успешного /orders/create
+window.currentOrderId = window.currentOrderId || null;
+
+function showCashTools(orderId) {
+  const box = document.getElementById('cash-tools');
+  document.getElementById('ct-order').textContent = orderId;
+  box.classList.remove('hidden');
+  refreshSummary();
+}
+
+function refreshSummary() {
+  if (!window.currentOrderId) return;
+  fetch(`/api/orders/summary_by_id?order_id=${encodeURIComponent(window.currentOrderId)}`)
+    .then(r => r.json())
+    .then(s => {
+      document.getElementById('ct-total').textContent = s.total.toFixed(2);
+      document.getElementById('ct-paid').textContent  = s.paid.toFixed(2);
+      document.getElementById('ct-due').textContent   = s.due.toFixed(2);
+      document.getElementById('ct-tips').textContent = s.tips.toFixed(2);
+    })
+    .catch(e => console.error('summary error', e));
+}
+
+// Универсальный ввод суммы
+function inputAmount(msg) {
+  let v = prompt(msg);
+  if (v === null) return null;
+  v = String(v).replace(',', '.').trim();
+  const n = parseFloat(v);
+  if (!isFinite(n) || n <= 0) { alert('Некорректная сумма'); return null; }
+  return n;
+}
+
+function requireOrderId() {
+  if (!window.currentOrderId) {
+    alert('Сначала создайте заказ');
+    return null;
+  }
+  return window.currentOrderId;
+}
+
+// 1) Оплата
+function payFlow(method) {
+  const orderId = requireOrderId(); if (!orderId) return;
+  if (method === 'cash') {
+    fetch(`/api/orders/summary_by_id?order_id=${encodeURIComponent(orderId)}`)
+      .then(r => r.json())
+      .then(s => {
+        if (s.due <= 0) { alert('Нечего оплачивать'); return; }
+        return showCashPayModal(s.due, 'Заказ ' + orderId).then(({ amount }) => {
+          submitPayment(orderId, 'cash', amount);
+        });
+      })
+      .catch(e => { if (e.message !== 'cancel') alert('Ошибка: ' + e.message); });
+    return;
+  }
+  const amt = inputAmount(`Сумма оплаты (${method})`);
+  if (amt === null) return;
+  submitPayment(orderId, method, amt);
+}
+
+function submitPayment(orderId, method, amt) {
+  const fd = new FormData();
+  fd.append('order_id', orderId);
+  fd.append('method', method);
+  fd.append('amount', String(amt));
+  fd.append('oper_id', window.currentOperId || 'cashier');
+  fetch('/api/payments/add', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') {
+        refreshSummary();
+      } else {
+        alert('Ошибка оплаты: ' + (d.detail || JSON.stringify(d)));
+      }
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+function showCashPayModal(dueAmount, title) {
+  return new Promise((resolve, reject) => {
+    const ov = document.getElementById('cash-overlay');
+    const dueEl = document.getElementById('cash-due');
+    const payEl = document.getElementById('cash-pay-amt');
+    const recvEl = document.getElementById('cash-received');
+    const changeEl = document.getElementById('cash-change');
+    const btnOk = document.getElementById('cash-ok');
+    const btnCancel = document.getElementById('cash-cancel');
+    const due = Math.max(0, Number(dueAmount) || 0);
+    document.getElementById('cash-title').textContent = title || 'Оплата наличными';
+    dueEl.textContent = due.toFixed(2);
+    payEl.value = due.toFixed(2);
+    recvEl.value = '';
+    changeEl.textContent = '0.00';
+    btnOk.disabled = true;
+    ov.style.display = 'flex';
+    setTimeout(() => recvEl.focus(), 50);
+
+    function payAmount() {
+      return parseFloat(String(payEl.value).replace(',', '.')) || 0;
+    }
+    function updateChange() {
+      const payment = payAmount();
+      const received = parseFloat(String(recvEl.value).replace(',', '.')) || 0;
+      const change = received - payment;
+      if (received <= 0 || payment <= 0) {
+        changeEl.textContent = '0.00';
+        btnOk.disabled = true;
+        return;
+      }
+      changeEl.textContent = change >= 0 ? change.toFixed(2) : '—';
+      changeEl.style.color = change >= 0 ? '#198754' : '#dc3545';
+      btnOk.disabled = received < payment;
+    }
+
+    payEl.oninput = updateChange;
+    recvEl.oninput = updateChange;
+    btnOk.onclick = () => {
+      const payment = payAmount();
+      const received = parseFloat(String(recvEl.value).replace(',', '.')) || 0;
+      if (received < payment || payment <= 0) return;
+      ov.style.display = 'none';
+      resolve({ amount: payment, received, change: received - payment });
+    };
+    btnCancel.onclick = () => {
+      ov.style.display = 'none';
+      reject(new Error('cancel'));
+    };
+  });
+}
+
+// 2) Скидка (по PIN)
+function discountFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const pct = inputAmount('Процент скидки (0..100)');
+  if (pct === null) return;
+  const oper = prompt('ID оператора, кто даёт скидку (31–40, 0/52/77):', window.currentOperId || '') || '';
+  const pin  = prompt('PIN:');
+  const reason = prompt('Причина скидки:', (window.quickReason||'')) || '';
+  if (pin === null) return;
+  const fd = new FormData();
+  fd.append('order_id', orderId);
+  fd.append('percent', String(pct));
+  fd.append('oper_id', oper.trim());
+  fd.append('pin', pin.trim());
+  fetch('/api/discounts/set', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') refreshSummary();
+      else alert('Ошибка скидки: ' + (d.detail || JSON.stringify(d)));
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 3) Чаевые (фиксируются по официанту)
+function tipFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const waiter = prompt('ID официанта (31–40):', '') || '';
+  if (!waiter) return;
+  const amt = inputAmount('Сумма чаевых');
+  if (amt === null) return;
+  const fd = new FormData();
+  fd.append('order_id', orderId);
+  fd.append('waiter_id', waiter.trim());
+  fd.append('amount', String(amt));
+  fetch('/api/tips/add', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') refreshSummary();
+      else alert('Ошибка чаевых: ' + (d.detail || JSON.stringify(d)));
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 4) Отмена позиции (по PIN)
+function cancelItemFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const itemId = prompt('ID позиции (item_id) для отмены:');
+  if (!itemId) return;
+  const oper = prompt('ID оператора (31–40, 0/52/77):', window.currentOperId || '') || '';
+  const pin  = prompt('PIN:');
+  if (pin === null) return;
+  const reason = prompt('Причина отмены:', (window.quickReason||'')) || '';
+  const fd = new FormData();
+  fd.append('item_id', String(itemId).trim());
+  fd.append('oper_id', oper.trim());
+  fd.append('pin', pin.trim());
+  fd.append('reason', reason);
+  fetch('/api/orders/cancel_item', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'cancelled') refreshSummary();
+      else alert('Ошибка отмены: ' + (d.detail || JSON.stringify(d)));
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 5) Отмена всего заказа (по PIN)
+function cancelOrderFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const oper = prompt('ID оператора (31–40, 0/52/77):', window.currentOperId || '') || '';
+  const pin  = prompt('PIN:');
+  if (pin === null) return;
+  const reason = prompt('Причина отмены заказа:', (window.quickReason||'')) || '';
+  const fd = new FormData();
+  fd.append('order_id', orderId);
+  fd.append('oper_id', oper.trim());
+  fd.append('pin', pin.trim());
+  fd.append('reason', reason);
+  fetch('/api/orders/cancel_order', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'cancelled') {
+        alert('Заказ отменён');
+        refreshSummary();
+      } else {
+        alert('Ошибка отмены заказа: ' + (d.detail || JSON.stringify(d)));
+      }
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 6) Сплит по ID позиций (в новый заказ)
+function splitItemsFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const idsRaw = prompt('ID позиций через запятую (например: 12,14,18):', '');
+  if (idsRaw === null) return;
+  const ids = idsRaw.split(',').map(s => parseInt(String(s).trim(), 10)).filter(Number.isFinite);
+  if (!ids.length) { alert('Не указаны валидные ID позиций'); return; }
+  const oper = prompt('ID оператора (31–40, 0/52/77):', window.currentOperId || '') || '';
+  const pin  = prompt('PIN:');
+  if (pin === null) return;
+
+  const fd = new FormData();
+  fd.append('order_id', orderId);
+  fd.append('item_ids_json', JSON.stringify(ids));
+  fd.append('oper_id', oper.trim());
+  fd.append('pin', pin.trim());
+  fetch('/api/orders/split_items', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') {
+        const sw = confirm(`✅ Создан новый заказ ${d.new_order_id}. Переключиться на него?`);
+        if (sw) {
+          window.currentOrderId = d.new_order_id;
+          document.getElementById('ct-order').textContent = d.new_order_id;
+        }
+        refreshSummary();
+      } else {
+        alert('Ошибка сплита: ' + (d.detail || JSON.stringify(d)));
+      }
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 7) Сплит по количеству (часть позиции в новый заказ)
+function splitQtyFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  const itemId = prompt('ID позиции (item_id) для частичного переноса:', '');
+  if (!itemId) return;
+  const qtyRaw = prompt('Сколько единиц перенести в новый заказ:', '');
+  if (qtyRaw === null) return;
+  const qty = parseInt(String(qtyRaw).trim(), 10);
+  if (!Number.isFinite(qty) || qty <= 0) { alert('Некорректное количество'); return; }
+
+  const oper = prompt('ID оператора (31–40, 0/52/77):', window.currentOperId || '') || '';
+  const pin  = prompt('PIN:');
+  if (pin === null) return;
+
+  const fd = new FormData();
+  fd.append('item_id', String(itemId).trim());
+  fd.append('qty_to_move', String(qty));
+  fd.append('oper_id', oper.trim());
+  fd.append('pin', pin.trim());
+  fetch('/api/orders/split_qty', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') {
+        const sw = confirm(`✅ Создан новый заказ ${d.new_order_id}. Переключиться на него?`);
+        if (sw) {
+          window.currentOrderId = d.new_order_id;
+          document.getElementById('ct-order').textContent = d.new_order_id;
+        }
+        refreshSummary();
+      } else {
+        alert('Ошибка сплита (qty): ' + (d.detail || JSON.stringify(d)));
+      }
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+}
+
+// 8) Закрыть заказ (только если due == 0)
+function settleFlow() {
+  const orderId = requireOrderId(); if (!orderId) return;
+  // Можно предварительно проверить due на клиенте
+  fetch(`/api/orders/summary_by_id?order_id=${encodeURIComponent(orderId)}`)
+    .then(r => r.json())
+    .then(s => {
+      if (s.due > 1e-6) {
+        alert(`Остаток к оплате: ${s.due.toFixed(2)} ₽. Закрыть нельзя.`);
+        return;
+      }
+      const fd = new FormData();
+      fd.append('order_id', orderId);
+      fetch('/api/orders/settle', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+          if (d.status === 'settled') {
+            alert('✅ Заказ закрыт');
+            refreshSummary();
+          } else {
+            alert('Ошибка закрытия: ' + (d.detail || JSON.stringify(d)));
+          }
+        })
+        .catch(e => alert('Ошибка сети: ' + e.message));
+    })
+    .catch(e => alert('Ошибка сводки: ' + e.message));
+}
+</script>
+<!-- PIN-модалка -->
+<div id="cash-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9998">
+  <div style="background:#fff;padding:20px;border-radius:12px;min-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+    <h3 id="cash-title" style="margin:0 0 12px">Оплата наличными</h3>
+    <div style="display:flex;justify-content:space-between;margin:8px 0;font-size:15px">
+      <span>К оплате:</span><b id="cash-due" style="color:#d6336c;font-size:18px">0</b> ₽
+    </div>
+    <label style="font-size:13px;color:#495057">Сумма оплаты:</label>
+    <input id="cash-pay-amt" type="number" min="0" step="0.01" style="width:100%;padding:8px;font-size:16px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;margin:4px 0 10px">
+    <label style="font-size:13px;color:#495057">Получено от гостя:</label>
+    <input id="cash-received" type="number" min="0" step="0.01" placeholder="0" style="width:100%;padding:10px;font-size:18px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box;margin-top:4px">
+    <div style="display:flex;justify-content:space-between;margin:12px 0;font-size:16px">
+      <span>Сдача:</span><b id="cash-change" style="color:#198754;font-size:22px">0</b> ₽
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button type="button" id="cash-cancel" style="background:#6c757d;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer">Отмена</button>
+      <button type="button" id="cash-ok" style="background:#198754;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600" disabled>Принять</button>
+    </div>
+  </div>
+</div>
+<div id="pin-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9999">
+  <div style="background:#fff;padding:16px;border-radius:10px;min-width:320px;max-width:420px;box-shadow:0 8px 18px rgba(0,0,0,.2)">
+    <h3 style="margin:0 0 10px">Подтверждение операции</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input id="pin-oper" placeholder="ID оператора (31–40 или 0/52/77)" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input id="pin-code" type="password" placeholder="PIN" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="pinCancel()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Отмена</button>
+      <button onclick="pinOk()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Подтвердить</button>
+    </div>
+    <div id="pin-err" style="margin-top:8px;color:#d6336c;font-size:13px;min-height:18px"></div>
+  </div>
+</div>
+
+  <script>
+// Универсальный сборщик PIN/oper_id с промисом
+  (function(){
+    let resolver = null;
+    window.getPin = function(defaultOper){
+      document.getElementById('pin-err').textContent = '';
+      const ov = document.getElementById('pin-overlay');
+      const inOper = document.getElementById('pin-oper');
+      const inPin  = document.getElementById('pin-code');
+      inOper.value = (defaultOper || window.currentOperId || '').trim();
+      inPin.value = '';
+      ov.style.display = 'flex';
+      return new Promise((resolve) => { resolver = resolve; });
+    };
+    window.pinCancel = function(){
+      document.getElementById('pin-overlay').style.display='none';
+      if (resolver) resolver(null);
+    };
+    window.pinOk = function(){
+      const oper = (document.getElementById('pin-oper').value||'').trim();
+      const pin  = (document.getElementById('pin-code').value||'').trim();
+      if(!oper || !pin){ document.getElementById('pin-err').textContent='Укажите ID и PIN'; return; }
+      document.getElementById('pin-overlay').style.display='none';
+      if (resolver) resolver({oper_id: oper, pin});
+    };
+  })();
+
+// ПАТЧИ: заменить prompt на PIN-модалку (минимальные изменения)
+
+// 1) СКИДКА
+  const _origDiscountFlow = window.discountFlow;
+  window.discountFlow = async function(){
+    const orderId = (window.currentOrderId||'');
+    if(!orderId){ alert('Сначала создайте заказ'); return; }
+    const pctStr = prompt('Процент скидки (0..100):', '');
+    if(pctStr===null) return;
+    const pct = parseFloat(String(pctStr).replace(',','.'));
+    if(!isFinite(pct) || pct<0 || pct>100){ alert('Некорректный процент'); return; }
+    const creds = await getPin(window.currentOperId||'');
+    if(!creds) return;
+    const reason = prompt('Причина скидки:', (window.quickReason||'')) || '';
+    const fd = new FormData();
+    fd.append('order_id', orderId
+    );
+    fd.append('percent', String(pct));
+    fd.append('oper_id', (creds.oper_id||'').trim());
+    fd.append('pin', (creds.pin||'').trim());
+// при желании можно отправлять reason, если добавите приём на бэкенде:
+// fd.append('reason', reason);
+  fetch('/api/discounts/set', { method:'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.status === 'ok') { refreshSummary(); }
+      else { alert('Ошибка скидки: ' + (d.detail || JSON.stringify(d))); }
+    })
+    .catch(e => alert('Ошибка сети: ' + e.message));
+  };
+
+// 2) ОТМЕНА ПОЗИЦИИ (PIN)
+  const _origCancelItemFlow = window.cancelItemFlow;
+  window.cancelItemFlow = async function(){
+    const orderId = (window.currentOrderId||'');
+    if(!orderId){ alert('Сначала создайте заказ'); return; }
+    const itemId = prompt('ID позиции (item_id) для отмены:', '');
+    if (!itemId) return;
+    const reason = prompt('Причина отмены:', (window.quickReason||'')) || '';
+    const creds = await getPin(window.currentOperId||'');
+    if(!creds) return;
+    const fd = new FormData();
+    fd.append('item_id', String(itemId).trim());
+    fd.append('oper_id', (creds.oper_id||'').trim());
+    fd.append('pin', (creds.pin||'').trim());
+    fd.append('reason', reason);
+    fetch('/api/orders/cancel_item', { method:'POST', body: fd })
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'cancelled') { refreshSummary(); }
+        else { alert('Ошибка отмены: ' + (d.detail || JSON.stringify(d))); }
+      })
+      .catch(e => alert('Ошибка сети: ' + e.message));
+  };
+
+// 3) ОТМЕНА ЗАКАЗА (PIN)
+  const _origCancelOrderFlow = window.cancelOrderFlow;
+  window.cancelOrderFlow = async function(){
+    const orderId = (window.currentOrderId||'');
+    if(!orderId){ alert('Сначала создайте заказ'); return; }
+    const reason = prompt('Причина отмены заказа:', (window.quickReason||'')) || '';
+    const creds = await getPin(window.currentOperId||'');
+    if(!creds) return;
+    const fd = new FormData();
+    fd.append('order_id', orderId);
+    fd.append('oper_id', (creds.oper_id||'').trim());
+    fd.append('pin', (creds.pin||'').trim());
+    fd.append('reason', reason);
+    fetch('/api/orders/cancel_order', { method:'POST', body: fd })
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'cancelled') { alert('Заказ отменён'); refreshSummary(); }
+        else { alert('Ошибка отмены заказа: ' + (d.detail || JSON.stringify(d))); }
+      })
+      .catch(e => alert('Ошибка сети: ' + e.message));
+  };
+
+// 4) СПЛИТ ПО ID (PIN)
+  const _origSplitItemsFlow = window.splitItemsFlow;
+  window.splitItemsFlow = async function(){
+    const orderId = (window.currentOrderId||'');
+    if(!orderId){ alert('Сначала создайте заказ'); return; }
+    const idsRaw = prompt('ID позиций через запятую (например: 12,14,18):', '');
+    if (idsRaw === null) return;
+    const ids = idsRaw.split(',').map(s => parseInt(String(s).trim(),10)).filter(Number.isFinite);
+    if (!ids.length) { alert('Не указаны валидные ID позиций'); return; }
+    const creds = await getPin(window.currentOperId||'');
+    if(!creds) return;
+
+    const fd = new FormData();
+    fd.append('order_id', orderId);
+    fd.append('item_ids_json', JSON.stringify(ids));
+    fd.append('oper_id', (creds.oper_id||'').trim());
+    fd.append('pin', (creds.pin||'').trim());
+    fetch('/api/orders/split_items', { method:'POST', body: fd })
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'ok') {
+          const sw = confirm(`✅ Создан новый заказ ${d.new_order_id}. Переключиться на него?`);
+          if (sw) {
+            window.currentOrderId = d.new_order_id;
+            document.getElementById('ct-order').textContent = d.new_order_id;
+          }
+          refreshSummary();
+        } else {
+          alert('Ошибка сплита: ' + (d.detail || JSON.stringify(d)));
+        }
+      })
+      .catch(e => alert('Ошибка сети: ' + e.message));
+  };
+
+// 5) СПЛИТ ПО КОЛИЧЕСТВУ (PIN)
+  const _origSplitQtyFlow = window.splitQtyFlow;
+  window.splitQtyFlow = async function(){
+    const orderId = (window.currentOrderId||'');
+    if(!orderId){ alert('Сначала создайте заказ'); return; }
+    const itemId = prompt('ID позиции (item_id) для частичного переноса:', '');
+    if (!itemId) return;
+    const qtyRaw = prompt('Сколько единиц перенести в новый заказ:', '');
+    if (qtyRaw === null) return;
+    const qty = parseInt(String(qtyRaw).trim(), 10);
+    if (!Number.isFinite(qty) || qty <= 0) { alert('Некорректное количество'); return; }
+
+    const creds = await getPin(window.currentOperId||'');
+    if(!creds) return;
+
+    const fd = new FormData();
+    fd.append('item_id', String(itemId).trim());
+    fd.append('qty_to_move', String(qty));
+    fd.append('oper_id', (creds.oper_id||'').trim());
+    fd.append('pin', (creds.pin||'').trim());
+    fetch('/api/orders/split_qty', { method:'POST', body: fd })
+      .then(r => r.json())
+      .then(d => {
+        if (d.status === 'ok') {
+          const sw = confirm(`✅ Создан новый заказ ${d.new_order_id}. Переключиться на него?`);
+          if (sw) {
+            window.currentOrderId = d.new_order_id;
+            document.getElementById('ct-order').textContent = d.new_order_id;
+          }
+          refreshSummary();
+        } 
+		  else {
+          alert('Ошибка сплита (qty): ' + (d.detail || JSON.stringify(d)));
+        }
+      })
+      .catch(e => alert('Ошибка сети: ' + e.message));
+  };
+  </script>
+  <div id="bar-remind-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9999">
+    <div style="background:#fff;padding:18px;border-radius:12px;min-width:280px;max-width:420px">
+      <h3 id="bar-remind-title" style="margin:0 0 10px">Напоминание</h3>
+      <div id="bar-remind-body" style="font-size:14px;line-height:1.5;max-height:240px;overflow:auto"></div>
+      <div style="text-align:right;margin-top:12px">
+        <button type="button" onclick="document.getElementById('bar-remind-overlay').style.display='none'" style="background:#0a58ca;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer">OK</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  function startBarReminders(operId) {
+    const BAR = ['0','52','77','31','32','33','34','35','36','37','38','39','40'];
+    if (!BAR.includes(String(operId))) return;
+    function showBarRemind(title, html) {
+      document.getElementById('bar-remind-title').textContent = title;
+      document.getElementById('bar-remind-body').innerHTML = html;
+      document.getElementById('bar-remind-overlay').style.display = 'flex';
+    }
+    function fmt(r) {
+      return 'Стол ' + r.table_id + ' · ' + String(r.res_time||'').slice(0,5) + ' · ' + (r.guest_name||'') + ' · ' + (r.phone||'');
+    }
+    function poll(isLogin) {
+      fetch('/api/reservations/reminders').then(r => r.ok ? r.json() : null).then(d => {
+        if (!d) return;
+        const morningKey = 'b_morning_' + operId + '_' + d.day;
+        if (isLogin && (d.today||[]).length && !localStorage.getItem(morningKey)) {
+          localStorage.setItem(morningKey, '1');
+          showBarRemind('Брони на сегодня', (d.today||[]).map(r => '<div>'+fmt(r)+'</div>').join(''));
+        }
+        (d.due_soon||[]).forEach(r => {
+          const key = 'b_hour_' + operId + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showBarRemind('Через час бронь', '<div>'+fmt(r)+'</div>');
+        });
+        (d.day_before||[]).forEach(r => {
+          const key = 'b_daybefore_' + operId + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showBarRemind('Завтра ' + (r.is_closed_event ? 'закрытое мероприятие' : 'бронь'), '<div>'+fmt(r)+'</div>');
+        });
+        if (isLogin && (d.morning||[]).length) {
+          const mk = 'b_morning2_' + operId + '_' + d.day;
+          if (!localStorage.getItem(mk)) {
+            localStorage.setItem(mk, '1');
+            showBarRemind('Сегодня брони и мероприятия', (d.morning||[]).map(r => '<div>'+fmt(r)+'</div>').join(''));
+          }
+        }
+        (d.due_soon_2h||[]).forEach(r => {
+          const key = 'b_2h_' + operId + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showBarRemind(r.is_closed_event ? 'Через 2 часа мероприятие' : 'Через 2 часа бронь', '<div>'+fmt(r)+'</div>');
+        });
+      }).catch(() => {});
+    }
+    poll(true);
+    setInterval(() => poll(false), 30000);
+  }
+  </script>
+</body>
+</html>

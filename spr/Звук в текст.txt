@@ -1,0 +1,28 @@
+# скрипт распознаеть аудио в текст
+import whisper
+
+model = whisper.load_model("base")
+result = model.transcribe("audio.wav")
+print(result["text"])
+
+
+
+
+import whisper
+
+model = whisper.load_model("small")  # small заметно лучше base, при этом быстро на CPU
+options = {
+    "language": "ru",          # принудительно русский (иначе может пытаться угадать)
+    "task": "transcribe"       # если не нужно переводить на другой язык
+}
+
+result = model.transcribe("output35.wav", **options)
+print(result["text"])
+
+bash
+ffmpeg -i audio.wav -af "afftdn=nf=-35" -ar 16000 -ac 1 output35.wav
+
+
+nf=-20 — лёгкий шум (тихий гул вентиляции).
+nf=-25 — средний шум (разговоры в зале, фоновая музыка).
+nf=-30 — сильный шум (кафе в час пик, улица). Если голос начнёт «сыпаться», уменьшай.

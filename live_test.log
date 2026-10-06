@@ -1,0 +1,47 @@
+INFO:     Started server process [20520]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8099 (Press CTRL+C to quit)
+[OK] База данных успешно инициализирована.
+[OK] migrate_v1: расширенные таблицы и индексы применены.
+[OK] migrate_v2: расширения БД применены.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:59446 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59447 - "GET /api/menu HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59448 - "GET /api/orders/active HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59449 - "GET /api/operators/list HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59450 - "GET /api/ui/default.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59451 - "GET /api/ui/cook_pos.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59452 - "GET /api/ui/waiter_pos.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59453 - "GET /api/ui/guest_pos.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59454 - "GET /api/ui/director.html HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:59455 - "GET /api/reservations?day=2026-09-07 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59456 - "GET /api/report/tips_by_waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59457 - "GET /api/reasons/cancel/list HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59458 - "GET /api/admin/check_schema HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:59459 - "GET /api/waiter/tables?oper_id=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59460 - "GET /api/settings/max-table HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59490 - "GET /api/admin/check_schema HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59491 - "GET /api/scan_qr?scan_data=XXX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59492 - "POST /api/payments/add HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59493 - "POST /api/orders/settle HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59494 - "GET /api/menu HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60207 - "POST /api/export/day HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60208 - "POST /api/export/day HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60209 - "POST /api/export/day HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60210 - "POST /api/menu/stoplist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60211 - "POST /api/menu/stoplist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60212 - "POST /api/orders/create HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60213 - "POST /api/orders/create HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60214 - "POST /api/feedback/add HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60215 - "POST /api/feedback/add HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60216 - "POST /api/feedback/add HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60217 - "GET /api/feedback/status?order_id=ORD-123126 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60218 - "GET /api/feedback/day HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60219 - "POST /api/orders/create HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60220 - "POST /api/discounts/set HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60221 - "POST /api/orders/split_qty HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60222 - "GET /api/orders/summary_by_id?order_id=ORD-123127 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60223 - "GET /api/guest/bill?table_id=1 HTTP/1.1" 200 OK

@@ -1,0 +1,12 @@
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+logs/
+*.log
+node_modules/

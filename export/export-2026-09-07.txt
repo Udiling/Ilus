@@ -1,0 +1,501 @@
+# Export day: 2026-09-07
+
+## SUMMARY
+Gross (items excl. cancelled): 44000.00
+Cancelled items: 0
+Paid total: 105050.00
+Tips total: 100.00
+
+## ITEMS
+ORD-203726	1	565	Салат Амурфу	1	400.0	closed	2026-09-07 17:37:26
+ORD-203726	1	566	Салат Афины	1	450.0	closed	2026-09-07 17:37:26
+ORD-203726	1	490	Вареники с капустой (продаются с жареным луком)	1	350.0	closed	2026-09-07 17:37:26
+ORD-203726	1	560	Язык под майонезом	1	500.0	closed	2026-09-07 17:37:26
+ORD-203755	12	256	Разливное чешское светлое	4	250.0	closed	2026-09-07 17:37:55
+ORD-203755	12	311	Ред Булл	3	400.0	closed	2026-09-07 17:37:55
+ORD-204531	12	104	Водка‑царская золотая	2	2000.0	closed	2026-09-07 17:45:31
+ORD-204531	12	113	Алазанская долина. красное полусладкое	2	150.0	closed	2026-09-07 17:45:31
+ORD-204531	12	107	Водка. тундра	6	700.0	closed	2026-09-07 17:45:31
+ORD-204531	12	553	Салат «Нептун»	4	500.0	closed	2026-09-07 17:45:31
+ORD-204531	12	554	Салат «Цезарь» с креветкой	2	750.0	closed	2026-09-07 17:45:31
+ORD-204531	12	556	Ассорти из свежих овощей	2	600.0	closed	2026-09-07 17:45:31
+ORD-204531	12	557	Ассорти из солёных овощей	1	600.0	closed	2026-09-07 17:45:31
+ORD-204531	12	552	Салат «Лагуна»	1	750.0	closed	2026-09-07 17:45:31
+ORD-204531	12	562	Салат крестьянский	1	400.0	closed	2026-09-07 17:45:31
+ORD-204531	12	564	Салат весенний	1	300.0	closed	2026-09-07 17:45:31
+ORD-204531	12	565	Салат Амурфу	1	400.0	closed	2026-09-07 17:45:31
+ORD-204531	12	561	Салат Греческий	3	500.0	closed	2026-09-07 17:45:31
+ORD-204531	12	558	Грибы маринованные	2	300.0	closed	2026-09-07 17:45:31
+ORD-204531	12	559	Сельдь с луком	2	350.0	closed	2026-09-07 17:45:31
+ORD-204531	12	560	Язык под майонезом	2	500.0	closed	2026-09-07 17:45:31
+ORD-204531	12	102	Водка. белая берёзка	1	300.0	closed	2026-09-07 17:45:31
+ORD-204531	12	106	Водка. царская золотая	1	200.0	closed	2026-09-07 17:45:31
+ORD-213356	12	103	Водка. белая берёзка	1	150.0	closed	2026-09-07 18:33:56
+ORD-213356	12	114	Шампанское. Абрау‑Дюрсо. полусладкое	2	1400.0	closed	2026-09-07 18:33:56
+ORD-213356	12	457	Шашлык из куриного филе	1	250.0	closed	2026-09-07 18:33:56
+ORD-213356	12	458	Рулет из птицы. Домашняя колбаска	1	450.0	closed	2026-09-07 18:33:56
+ORD-213356	12	552	Салат «Лагуна»	1	750.0	closed	2026-09-07 18:33:56
+ORD-213356	12	554	Салат «Цезарь» с креветкой	1	750.0	closed	2026-09-07 18:33:56
+ORD-213356	12	555	Ассорти мясное	1	900.0	closed	2026-09-07 18:33:56
+ORD-213356	12	311	Ред Булл	1	400.0	closed	2026-09-07 18:33:56
+ORD-213356	12	401	Чир-чир с мясом	1	400.0	closed	2026-09-07 18:33:56
+ORD-213356	12	402	Чир-чир с мясом и черносливом	1	450.0	closed	2026-09-07 18:33:56
+ORD-213356	12	403	Чир-чир с мясом и грибами	1	450.0	closed	2026-09-07 18:33:56
+ORD-213356	12	405	Чир-чир с мясом, сыром и помидором	2	450.0	closed	2026-09-07 18:33:56
+ORD-213356	12	406	Чир-чир с сыром и грибами	1	450.0	closed	2026-09-07 18:33:56
+ORD-213356	12	422	Чир-чир с бананом и шоколадом	1	400.0	closed	2026-09-07 18:33:56
+ORD-213356	12	423	Чир-чир с шоколадом	1	350.0	closed	2026-09-07 18:33:56
+ORD-213356	12	330	Арьян — домашняя ряженка	1	150.0	closed	2026-09-07 18:33:56
+ORD-213525	5	557	Ассорти из солёных овощей	1	600.0	closed	2026-09-07 18:35:25
+ORD-213525	5	559	Сельдь с луком	1	350.0	closed	2026-09-07 18:35:25
+ORD-213525	5	553	Салат «Нептун»	1	500.0	closed	2026-09-07 18:35:25
+ORD-213525	5	561	Салат Греческий	1	500.0	closed	2026-09-07 18:35:25
+ORD-213525	5	574	Пикантный	1	500.0	closed	2026-09-07 18:35:25
+ORD-213525	5	408	Чир-чир с сыром, помидором и зеленью	1	450.0	closed	2026-09-07 18:35:25
+ORD-213525	5	409	Чир-чир с ветчиной и сыром	1	450.0	closed	2026-09-07 18:35:25
+ORD-213525	5	411	Чир-чир с мидиями и сыром	1	700.0	closed	2026-09-07 18:35:25
+ORD-213525	5	412	Чир-чир с креветкой и сыром	1	850.0	closed	2026-09-07 18:35:25
+ORD-213525	5	413	Чир-чир с грибами	1	400.0	closed	2026-09-07 18:35:25
+ORD-213525	5	414	Чир-чир с творогом и зеленью	1	400.0	closed	2026-09-07 18:35:25
+ORD-213525	5	403	Чир-чир с мясом и грибами	1	450.0	closed	2026-09-07 18:35:25
+ORD-220600	12	105	Водка. царская золотая	1	400.0	closed	2026-09-07 19:06:00
+ORD-220600	12	104	Водка‑царская золотая	1	2000.0	closed	2026-09-07 19:06:00
+ORD-220600	12	114	Шампанское. Абрау‑Дюрсо. полусладкое	1	1400.0	closed	2026-09-07 19:06:00
+ORD-220600	12	106	Водка. царская золотая	1	200.0	closed	2026-09-07 19:06:00
+
+## PAYMENTS
+ORD-093544	cash	1950.0	77	2026-09-07 11:12:44
+ORD-090320	transfer	2600.0	77	2026-09-07 17:39:45
+ORD-090341	transfer	2600.0	77	2026-09-07 17:39:45
+ORD-203755	transfer	2200.0	77	2026-09-07 17:39:45
+ORD-220203	transfer	5250.0	77	2026-09-07 17:39:45
+ORD-220341	transfer	2400.0	77	2026-09-07 17:39:45
+ORD-221120	transfer	2350.0	77	2026-09-07 17:39:45
+ORD-221628	transfer	4750.0	77	2026-09-07 17:39:45
+ORD-235147	transfer	8200.0	77	2026-09-07 17:39:45
+ORD-235203	transfer	4700.0	77	2026-09-07 17:39:45
+ORD-204531	cash	19950.0	77	2026-09-07 18:54:53
+ORD-213356	cash	10000.0	77	2026-09-07 18:54:53
+ORD-230614	transfer	1900.0	77	2026-09-07 18:55:20
+ORD-200424	card	100.0	77	2026-09-07 19:01:58
+ORD-201201	card	150.0	77	2026-09-07 19:01:58
+ORD-201231	card	150.0	77	2026-09-07 19:01:58
+ORD-213525	card	6150.0	77	2026-09-07 19:01:58
+ORD-222856	card	11850.0	77	2026-09-07 19:01:58
+ORD-223347	card	7150.0	77	2026-09-07 19:01:58
+ORD-233221	card	2600.0	77	2026-09-07 19:01:58
+ORD-090235	transfer	2350.0	77	2026-09-07 19:02:06
+ORD-203726	transfer	1700.0	77	2026-09-07 19:02:06
+ORD-220600	cash	4000.0	77	2026-09-07 19:10:47
+
+## TIPS
+ORD-090320	77	100.0	2026-09-07 18:54:54
+
+## DISCOUNTS
+
+## EVENTS
+ORD-233347	103	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 11:04:11
+ORD-233347	103	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 11:05:00
+ORD-093544	None	payment	{"due_before": 1950.0}	{"paid": 1950.0, "method": "cash"}	77	1	2026-09-07 11:12:44
+ORD-093544	None	settle	{"due_before": 0.0}	{"total": 1950.0, "paid": 1950.0, "by_method": {"cash": 1950.0}}	system	1	2026-09-07 11:12:44
+ORD-203755	None	waiter_call		{"table_id": "12", "kind": "pay", "due": 35050.0, "order_ids": ["ORD-090320", "ORD-090341", "ORD-203755", "ORD-220203", "ORD-220341", "ORD-221120", "ORD-221628", "ORD-235147", "ORD-235203"], "order_id": "ORD-203755"}	12	1	2026-09-07 17:38:26
+ORD-203755	None	waiter_call		{"table_id": "12", "kind": "call", "due": 35050.0, "order_ids": ["ORD-090320", "ORD-090341", "ORD-203755", "ORD-220203", "ORD-220341", "ORD-221120", "ORD-221628", "ORD-235147", "ORD-235203"], "order_id": "ORD-203755"}	12	1	2026-09-07 17:38:37
+ORD-233347	None	settle	{"due_before": 0.0}	{"total": 850.0, "paid": 850.0, "by_method": {"cash": 850.0}}	system	1	2026-09-07 17:39:28
+ORD-090320	None	payment	{"due_before": 2600.0}	{"paid": 2600.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-090320	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 17:39:45
+ORD-090341	None	payment	{"due_before": 2600.0}	{"paid": 2600.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-090341	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 17:39:45
+ORD-203755	None	payment	{"due_before": 2200.0}	{"paid": 2200.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-203755	None	settle	{"due_before": 0.0}	{"total": 2200.0, "paid": 2200.0, "by_method": {"transfer": 2200.0}}	system	1	2026-09-07 17:39:45
+ORD-220203	None	payment	{"due_before": 5250.0}	{"paid": 5250.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-220203	None	settle	{"due_before": 0.0}	{"total": 5250.0, "paid": 5250.0, "by_method": {"transfer": 5250.0}}	system	1	2026-09-07 17:39:45
+ORD-220341	None	payment	{"due_before": 2400.0}	{"paid": 2400.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-220341	None	settle	{"due_before": 0.0}	{"total": 2400.0, "paid": 2400.0, "by_method": {"transfer": 2400.0}}	system	1	2026-09-07 17:39:45
+ORD-221120	None	payment	{"due_before": 2350.0}	{"paid": 2350.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-221120	None	settle	{"due_before": 0.0}	{"total": 2350.0, "paid": 2350.0, "by_method": {"transfer": 2350.0}}	system	1	2026-09-07 17:39:45
+ORD-221628	None	payment	{"due_before": 4750.0}	{"paid": 4750.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-221628	None	settle	{"due_before": 0.0}	{"total": 4750.0, "paid": 4750.0, "by_method": {"transfer": 4750.0}}	system	1	2026-09-07 17:39:45
+ORD-235147	None	payment	{"due_before": 8200.0}	{"paid": 8200.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-235147	None	settle	{"due_before": 0.0}	{"total": 8200.0, "paid": 8200.0, "by_method": {"transfer": 8200.0}}	system	1	2026-09-07 17:39:45
+ORD-235203	None	payment	{"due_before": 4700.0}	{"paid": 4700.0, "method": "transfer"}	77	1	2026-09-07 17:39:45
+ORD-235203	None	settle	{"due_before": 0.0}	{"total": 4700.0, "paid": 4700.0, "by_method": {"transfer": 4700.0}}	system	1	2026-09-07 17:39:45
+ORD-203755	None	waiter_call		{"table_id": "12", "kind": "pay", "due": 0.0, "order_ids": ["ORD-090320", "ORD-090341", "ORD-203755", "ORD-220203", "ORD-220341", "ORD-221120", "ORD-221628", "ORD-235147", "ORD-235203"], "order_id": "ORD-203755"}	12	1	2026-09-07 17:44:42
+ORD-203755	None	waiter_call		{"table_id": "12", "kind": "call", "due": 0.0, "order_ids": ["ORD-090320", "ORD-090341", "ORD-203755", "ORD-220203", "ORD-220341", "ORD-221120", "ORD-221628", "ORD-235147", "ORD-235203"], "order_id": "ORD-203755"}	12	1	2026-09-07 17:44:46
+ORD-090320	23	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:36
+ORD-220203	34	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:37
+ORD-220341	41	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:38
+ORD-220341	42	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:39
+ORD-221628	80	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:39
+ORD-090320	24	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:57
+ORD-090320	25	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:58
+ORD-090320	27	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:36:59
+ORD-090341	28	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:00
+ORD-090341	29	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:00
+ORD-203726	133	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:21
+ORD-203726	134	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:22
+ORD-203726	136	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:23
+ORD-204531	142	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:23
+ORD-204531	143	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:24
+ORD-213525	176	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:57
+ORD-213525	175	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:58
+ORD-213525	174	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:58
+ORD-213525	173	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:59
+ORD-213525	172	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:59
+ORD-213356	162	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:37:59
+ORD-213356	161	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:00
+ORD-213356	160	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:00
+ORD-204531	153	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:00
+ORD-204531	152	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:01
+ORD-204531	151	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:01
+ORD-204531	150	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:02
+ORD-204531	148	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 18:38:03
+ORD-201203	48	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:18
+ORD-201205	49	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:18
+ORD-201203	48	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:20
+ORD-201205	49	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:20
+ORD-201205	49	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:21
+ORD-201203	48	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 18:38:21
+ORD-235147	116	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:47
+ORD-213356	164	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:47
+ORD-213356	165	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:48
+ORD-213356	166	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:48
+ORD-235147	115	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:49
+ORD-235147	114	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:50
+ORD-235147	113	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 18:38:51
+ORD-235147	113	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:03
+ORD-235147	114	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:04
+ORD-235147	115	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:04
+ORD-235147	116	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:05
+ORD-213356	164	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:06
+ORD-213356	165	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 18:39:06
+ORD-090320	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 18:54:53
+ORD-090341	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 18:54:53
+ORD-204531	None	payment	{"due_before": 19950.0}	{"paid": 19950.0, "method": "cash"}	77	1	2026-09-07 18:54:53
+ORD-204531	None	settle	{"due_before": 0.0}	{"total": 19950.0, "paid": 19950.0, "by_method": {"cash": 19950.0}}	system	1	2026-09-07 18:54:53
+ORD-213356	None	payment	{"due_before": 10000.0}	{"paid": 10000.0, "method": "cash"}	77	1	2026-09-07 18:54:53
+ORD-213356	None	settle	{"due_before": 0.0}	{"total": 10000.0, "paid": 10000.0, "by_method": {"cash": 10000.0}}	system	1	2026-09-07 18:54:53
+ORD-220203	None	settle	{"due_before": 0.0}	{"total": 5250.0, "paid": 5250.0, "by_method": {"transfer": 5250.0}}	system	1	2026-09-07 18:54:53
+ORD-220341	None	settle	{"due_before": 0.0}	{"total": 2400.0, "paid": 2400.0, "by_method": {"transfer": 2400.0}}	system	1	2026-09-07 18:54:53
+ORD-221628	None	settle	{"due_before": 0.0}	{"total": 4750.0, "paid": 4750.0, "by_method": {"transfer": 4750.0}}	system	1	2026-09-07 18:54:53
+ORD-235147	None	settle	{"due_before": 0.0}	{"total": 8200.0, "paid": 8200.0, "by_method": {"transfer": 8200.0}}	system	1	2026-09-07 18:54:54
+ORD-090320	None	tip_add		{"tips": 100.0, "waiter_id": "77"}	77	1	2026-09-07 18:54:54
+ORD-230614	None	payment	{"due_before": 1900.0}	{"paid": 1900.0, "method": "transfer"}	77	1	2026-09-07 18:55:20
+ORD-230614	None	settle	{"due_before": 0.0}	{"total": 1900.0, "paid": 1900.0, "by_method": {"transfer": 1900.0}}	system	1	2026-09-07 18:55:20
+ORD-213525	172	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:55:42
+ORD-213525	173	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:55:45
+ORD-213525	174	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:55:48
+ORD-213525	175	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:55:52
+ORD-213525	176	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:55:54
+ORD-203726	133	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:56:03
+ORD-203726	136	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:56:03
+ORD-203726	134	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 18:56:04
+ORD-090320	24	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:58:59
+ORD-090320	25	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:00
+ORD-090320	26	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:00
+ORD-090320	27	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:01
+ORD-090341	28	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:01
+ORD-090341	29	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:01
+ORD-090341	30	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:02
+ORD-090341	31	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:02
+ORD-203726	135	status_change		{"status": "ready", "stage": 1}	61	1	2026-09-07 18:59:10
+ORD-213525	177	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:49
+ORD-213525	178	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:49
+ORD-213525	179	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:50
+ORD-213525	180	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:50
+ORD-213525	181	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:50
+ORD-213525	182	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:50
+ORD-213525	183	status_change		{"status": "working", "stage": 2}	65	1	2026-09-07 18:59:50
+ORD-213356	166	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:00:23
+ORD-213525	177	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:06
+ORD-213525	178	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:07
+ORD-213525	179	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:07
+ORD-213525	180	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:08
+ORD-213525	181	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:08
+ORD-213525	182	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:09
+ORD-213525	183	status_change		{"status": "ready", "stage": 3}	68	1	2026-09-07 19:01:10
+ORD-090320	24	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:23
+ORD-090320	25	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:23
+ORD-090320	26	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:23
+ORD-090320	27	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:23
+ORD-090341	28	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:24
+ORD-090341	29	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:24
+ORD-090341	30	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:24
+ORD-090341	31	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:24
+ORD-203726	135	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:01:24
+ORD-213356	166	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:24
+ORD-213525	177	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	178	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	179	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	180	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	181	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	182	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:25
+ORD-213525	183	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:01:26
+ORD-090320	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 19:01:37
+ORD-090341	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 19:01:37
+ORD-213356	None	settle	{"due_before": 0.0}	{"total": 10000.0, "paid": 10000.0, "by_method": {"cash": 10000.0}}	system	1	2026-09-07 19:01:37
+ORD-200424	None	payment	{"due_before": 100.0}	{"paid": 100.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-200424	None	settle	{"due_before": 0.0}	{"total": 100.0, "paid": 100.0, "by_method": {"card": 100.0}}	system	1	2026-09-07 19:01:58
+ORD-201201	None	payment	{"due_before": 150.0}	{"paid": 150.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-201201	None	settle	{"due_before": 0.0}	{"total": 150.0, "paid": 150.0, "by_method": {"card": 150.0}}	system	1	2026-09-07 19:01:58
+ORD-201231	None	payment	{"due_before": 150.0}	{"paid": 150.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-201231	None	settle	{"due_before": 0.0}	{"total": 150.0, "paid": 150.0, "by_method": {"card": 150.0}}	system	1	2026-09-07 19:01:58
+ORD-213525	None	payment	{"due_before": 6150.0}	{"paid": 6150.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-213525	None	settle	{"due_before": 0.0}	{"total": 6150.0, "paid": 6150.0, "by_method": {"card": 6150.0}}	system	1	2026-09-07 19:01:58
+ORD-222856	None	payment	{"due_before": 11850.0}	{"paid": 11850.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-222856	None	settle	{"due_before": 0.0}	{"total": 11850.0, "paid": 11850.0, "by_method": {"card": 11850.0}}	system	1	2026-09-07 19:01:58
+ORD-223347	None	payment	{"due_before": 7150.0}	{"paid": 7150.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-223347	None	settle	{"due_before": 0.0}	{"total": 7150.0, "paid": 7150.0, "by_method": {"card": 7150.0}}	system	1	2026-09-07 19:01:58
+ORD-233221	None	payment	{"due_before": 2600.0}	{"paid": 2600.0, "method": "card"}	77	1	2026-09-07 19:01:58
+ORD-233221	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"card": 2600.0}}	system	1	2026-09-07 19:01:58
+ORD-090235	None	payment	{"due_before": 2350.0}	{"paid": 2350.0, "method": "transfer"}	77	1	2026-09-07 19:02:06
+ORD-090235	None	settle	{"due_before": 0.0}	{"total": 2350.0, "paid": 2350.0, "by_method": {"transfer": 2350.0}}	system	1	2026-09-07 19:02:06
+ORD-203726	None	payment	{"due_before": 1700.0}	{"paid": 1700.0, "method": "transfer"}	77	1	2026-09-07 19:02:06
+ORD-203726	None	settle	{"due_before": 0.0}	{"total": 1700.0, "paid": 1700.0, "by_method": {"transfer": 1700.0}}	system	1	2026-09-07 19:02:06
+ORD-220600	None	waiter_call		{"table_id": "12", "kind": "pay", "due": 4000.0, "order_ids": ["ORD-090320", "ORD-090341", "ORD-203755", "ORD-204531", "ORD-213356", "ORD-220203", "ORD-220341", "ORD-220600", "ORD-221120", "ORD-221628", "ORD-235147", "ORD-235203"], "order_id": "ORD-220600"}	12	1	2026-09-07 19:06:04
+ORD-220203	34	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:49
+ORD-220341	41	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:50
+ORD-220341	42	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:51
+ORD-201201	47	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:55
+ORD-201231	51	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:56
+ORD-221628	80	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:57
+ORD-221628	81	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:57
+ORD-093544	14	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:58
+ORD-090320	20	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:06:59
+ORD-090320	21	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:00
+ORD-090320	22	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:01
+ORD-090320	23	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:02
+ORD-221628	82	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:03
+ORD-222856	85	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:04
+ORD-222856	86	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:05
+ORD-222856	87	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:06
+ORD-222856	88	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:07
+ORD-233221	98	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:08
+ORD-233221	99	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:08
+ORD-233221	100	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:09
+ORD-233221	101	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:09
+ORD-233347	102	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:10
+ORD-233347	103	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:10
+ORD-233347	104	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:12
+ORD-235147	110	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:12
+ORD-235147	111	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:16
+ORD-235147	112	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:16
+ORD-235203	122	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:17
+ORD-235203	123	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:17
+ORD-235203	124	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:18
+ORD-203755	137	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:19
+ORD-203755	138	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:19
+ORD-204531	139	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:21
+ORD-204531	140	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:22
+ORD-204531	141	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:23
+ORD-204531	154	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:24
+ORD-204531	155	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:26
+ORD-213356	157	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:27
+ORD-213356	156	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:28
+ORD-213356	163	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:29
+ORD-213356	171	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:30
+ORD-220600	184	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:31
+ORD-220600	185	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:32
+ORD-220600	186	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:32
+ORD-220600	187	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:33
+ORD-093544	12	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:46
+ORD-093544	13	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:47
+ORD-090320	24	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:52
+ORD-090320	25	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:53
+ORD-090320	26	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:54
+ORD-090320	27	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:54
+ORD-090341	28	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:55
+ORD-090341	29	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:55
+ORD-090341	30	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:56
+ORD-090341	31	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:56
+ORD-090341	32	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:59
+ORD-090341	33	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:07:59
+ORD-200424	45	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:00
+ORD-221120	76	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:01
+ORD-221120	77	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:01
+ORD-221120	78	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:02
+ORD-221120	79	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:02
+ORD-221628	83	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:03
+ORD-221628	84	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:03
+ORD-235147	120	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:04
+ORD-235147	121	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:04
+ORD-203726	135	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:05
+ORD-213356	158	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:06
+ORD-213356	159	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:08
+ORD-230614	1	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:16
+ORD-230614	2	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:17
+ORD-230614	3	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:17
+ORD-230614	4	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:18
+ORD-090235	15	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:18
+ORD-090235	16	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:19
+ORD-090235	17	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:20
+ORD-090235	18	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:20
+ORD-090235	19	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:22
+ORD-235147	117	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:22
+ORD-235147	118	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:23
+ORD-235147	119	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:24
+ORD-203726	133	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:24
+ORD-203726	134	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:25
+ORD-203726	136	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:25
+ORD-204531	142	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:26
+ORD-204531	143	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:28
+ORD-204531	144	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:30
+ORD-204531	145	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:30
+ORD-204531	146	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:31
+ORD-204531	147	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:31
+ORD-204531	148	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:32
+ORD-204531	149	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:33
+ORD-204531	150	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:33
+ORD-204531	151	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:34
+ORD-204531	152	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:35
+ORD-204531	153	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:35
+ORD-213356	160	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:36
+ORD-213356	161	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:37
+ORD-213356	162	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:39
+ORD-213525	172	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:40
+ORD-213525	173	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:41
+ORD-213525	174	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:41
+ORD-213525	175	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:43
+ORD-213525	176	status_change		{"status": "ready", "stage": 1}	77	1	2026-09-07 19:08:43
+ORD-201203	48	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 19:08:56
+ORD-201203	48	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 19:08:57
+ORD-201205	49	status_change		{"status": "working", "stage": 1}	77	1	2026-09-07 19:08:58
+ORD-213356	167	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 19:09:08
+ORD-213356	168	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 19:09:08
+ORD-213356	169	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 19:09:09
+ORD-213356	170	status_change		{"status": "working", "stage": 2}	77	1	2026-09-07 19:09:09
+ORD-213356	167	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 19:09:10
+ORD-213356	168	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 19:09:10
+ORD-213356	169	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 19:09:11
+ORD-213356	170	status_change		{"status": "ready", "stage": 3}	77	1	2026-09-07 19:09:12
+ORD-230614	1	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:55
+ORD-230614	2	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:55
+ORD-230614	3	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:56
+ORD-230614	4	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:56
+ORD-093544	12	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:56
+ORD-093544	13	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:56
+ORD-093544	14	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:57
+ORD-090235	15	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:57
+ORD-090235	16	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:57
+ORD-090235	17	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:57
+ORD-090235	18	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:57
+ORD-090235	19	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	20	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	21	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	22	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	23	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	24	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:58
+ORD-090320	25	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090320	26	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090320	27	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090341	28	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090341	29	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090341	30	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:09:59
+ORD-090341	31	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-090341	32	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-090341	33	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-220203	34	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-220341	41	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-220341	42	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:00
+ORD-200424	45	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:01
+ORD-201201	47	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:01
+ORD-201231	51	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:01
+ORD-221120	76	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:01
+ORD-221120	77	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:01
+ORD-221120	78	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221120	79	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221628	80	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221628	81	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221628	82	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221628	83	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:02
+ORD-221628	84	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:03
+ORD-222856	85	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:03
+ORD-222856	86	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:03
+ORD-222856	87	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:03
+ORD-222856	88	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:03
+ORD-233221	98	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:04
+ORD-233221	99	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:04
+ORD-233221	100	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:04
+ORD-233221	101	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:04
+ORD-233347	102	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:04
+ORD-233347	103	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-233347	104	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-235147	110	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-235147	111	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-235147	112	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-235147	117	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:05
+ORD-235147	118	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:06
+ORD-235147	119	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:06
+ORD-235147	120	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:06
+ORD-235147	121	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:06
+ORD-235203	122	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:06
+ORD-235203	123	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:07
+ORD-235203	124	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:07
+ORD-203726	133	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:07
+ORD-203726	134	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:07
+ORD-203726	135	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:07
+ORD-203726	136	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:08
+ORD-203755	137	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:08
+ORD-203755	138	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:08
+ORD-204531	139	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:08
+ORD-204531	140	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:08
+ORD-204531	141	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:09
+ORD-204531	142	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:09
+ORD-204531	143	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:09
+ORD-204531	144	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:09
+ORD-204531	145	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:09
+ORD-204531	146	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:10
+ORD-204531	147	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:10
+ORD-204531	148	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:10
+ORD-204531	149	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:10
+ORD-204531	150	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:10
+ORD-204531	151	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-204531	152	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-204531	153	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-204531	154	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-204531	155	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-213356	156	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:11
+ORD-213356	157	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:12
+ORD-213356	158	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:12
+ORD-213356	159	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:12
+ORD-213356	160	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:12
+ORD-213356	161	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:13
+ORD-213356	162	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:13
+ORD-213356	163	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:13
+ORD-213356	167	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:10:13
+ORD-213356	168	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:10:13
+ORD-213356	169	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:10:14
+ORD-213356	170	status_change		{"status": "served", "stage": 3}	77	1	2026-09-07 19:10:14
+ORD-213356	171	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:14
+ORD-213525	172	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:14
+ORD-213525	173	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:14
+ORD-213525	174	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:15
+ORD-213525	175	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:15
+ORD-213525	176	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:15
+ORD-220600	184	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:15
+ORD-220600	185	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:15
+ORD-220600	186	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:16
+ORD-220600	187	status_change		{"status": "served", "stage": 1}	77	1	2026-09-07 19:10:16
+ORD-090320	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 19:10:47
+ORD-090341	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"transfer": 2600.0}}	system	1	2026-09-07 19:10:47
+ORD-203755	None	settle	{"due_before": 0.0}	{"total": 2200.0, "paid": 2200.0, "by_method": {"transfer": 2200.0}}	system	1	2026-09-07 19:10:47
+ORD-204531	None	settle	{"due_before": 0.0}	{"total": 19950.0, "paid": 19950.0, "by_method": {"cash": 19950.0}}	system	1	2026-09-07 19:10:47
+ORD-213356	None	settle	{"due_before": 0.0}	{"total": 10000.0, "paid": 10000.0, "by_method": {"cash": 10000.0}}	system	1	2026-09-07 19:10:47
+ORD-220203	None	settle	{"due_before": 0.0}	{"total": 5250.0, "paid": 5250.0, "by_method": {"transfer": 5250.0}}	system	1	2026-09-07 19:10:47
+ORD-220341	None	settle	{"due_before": 0.0}	{"total": 2400.0, "paid": 2400.0, "by_method": {"transfer": 2400.0}}	system	1	2026-09-07 19:10:47
+ORD-220600	None	payment	{"due_before": 4000.0}	{"paid": 4000.0, "method": "cash"}	77	1	2026-09-07 19:10:47
+ORD-220600	None	settle	{"due_before": 0.0}	{"total": 4000.0, "paid": 4000.0, "by_method": {"cash": 4000.0}}	system	1	2026-09-07 19:10:47
+ORD-221120	None	settle	{"due_before": 0.0}	{"total": 2350.0, "paid": 2350.0, "by_method": {"transfer": 2350.0}}	system	1	2026-09-07 19:10:47
+ORD-221628	None	settle	{"due_before": 0.0}	{"total": 4750.0, "paid": 4750.0, "by_method": {"transfer": 4750.0}}	system	1	2026-09-07 19:10:47
+ORD-235147	None	settle	{"due_before": 0.0}	{"total": 8200.0, "paid": 8200.0, "by_method": {"transfer": 8200.0}}	system	1	2026-09-07 19:10:47
+ORD-235203	None	settle	{"due_before": 0.0}	{"total": 4700.0, "paid": 4700.0, "by_method": {"transfer": 4700.0}}	system	1	2026-09-07 19:10:47
+ORD-093544	None	settle	{"due_before": 0.0}	{"total": 1950.0, "paid": 1950.0, "by_method": {"cash": 1950.0}}	system	1	2026-09-07 19:10:59
+ORD-233347	None	settle	{"due_before": 0.0}	{"total": 850.0, "paid": 850.0, "by_method": {"cash": 850.0}}	system	1	2026-09-07 19:11:09
+ORD-200424	None	settle	{"due_before": 0.0}	{"total": 100.0, "paid": 100.0, "by_method": {"card": 100.0}}	system	1	2026-09-07 19:13:16
+ORD-201201	None	settle	{"due_before": 0.0}	{"total": 150.0, "paid": 150.0, "by_method": {"card": 150.0}}	system	1	2026-09-07 19:13:16
+ORD-201231	None	settle	{"due_before": 0.0}	{"total": 150.0, "paid": 150.0, "by_method": {"card": 150.0}}	system	1	2026-09-07 19:13:16
+ORD-213525	None	settle	{"due_before": 0.0}	{"total": 6150.0, "paid": 6150.0, "by_method": {"card": 6150.0}}	system	1	2026-09-07 19:13:16
+ORD-222856	None	settle	{"due_before": 0.0}	{"total": 11850.0, "paid": 11850.0, "by_method": {"card": 11850.0}}	system	1	2026-09-07 19:13:16
+ORD-233221	None	settle	{"due_before": 0.0}	{"total": 2600.0, "paid": 2600.0, "by_method": {"card": 2600.0}}	system	1	2026-09-07 19:13:16
+ORD-230614	None	settle	{"due_before": 0.0}	{"total": 1900.0, "paid": 1900.0, "by_method": {"transfer": 1900.0}}	system	1	2026-09-07 19:13:21
+ORD-090235	None	settle	{"due_before": 0.0}	{"total": 2350.0, "paid": 2350.0, "by_method": {"transfer": 2350.0}}	system	1	2026-09-07 19:13:24
+ORD-203726	None	settle	{"due_before": 0.0}	{"total": 1700.0, "paid": 1700.0, "by_method": {"transfer": 1700.0}}	system	1	2026-09-07 19:13:24

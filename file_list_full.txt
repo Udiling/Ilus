@@ -1,0 +1,173 @@
+C:\Offline Server\api
+C:\Offline Server\arch
+C:\Offline Server\cafe.db
+C:\Offline Server\cafe.db-shm
+C:\Offline Server\cafe.db-wal
+C:\Offline Server\check_db.py
+C:\Offline Server\check_refs.py
+C:\Offline Server\core
+C:\Offline Server\create_db.py
+C:\Offline Server\db
+C:\Offline Server\Dok
+C:\Offline Server\file_list_full.txt
+C:\Offline Server\load.log
+C:\Offline Server\main - ª®¯¨ï (2).py
+C:\Offline Server\main - ª®¯¨ï.py
+C:\Offline Server\main.py
+C:\Offline Server\Make Dir
+C:\Offline Server\menu-2026-07-19.txt
+C:\Offline Server\menu.html
+C:\Offline Server\menu_load.log
+C:\Offline Server\models
+C:\Offline Server\oper-2026-07-19.txt
+C:\Offline Server\qrs
+C:\Offline Server\qr_gen_auto.py
+C:\Offline Server\ref_seq.db
+C:\Offline Server\run_qr_generate.bat
+C:\Offline Server\spr
+C:\Offline Server\start_server.bat
+C:\Offline Server\static
+C:\Offline Server\templates
+C:\Offline Server\transaction.py
+C:\Offline Server\update_dict.py
+C:\Offline Server\update_menu.bat
+C:\Offline Server\update_oper.bat
+C:\Offline Server\utils
+C:\Offline Server\__pycache__
+C:\Offline Server\api\main.py
+C:\Offline Server\api\__init__.py
+C:\Offline Server\api\__pycache__
+C:\Offline Server\api\__pycache__\main.cpython-314.py
+C:\Offline Server\api\__pycache__\__init__.cpython-314.py
+C:\Offline Server\arch\menu
+C:\Offline Server\arch\oper
+C:\Offline Server\arch\menu\menu-2026-07-18_20260718_173515.txt
+C:\Offline Server\arch\menu\menu-2026-07-18_20260718_174652.txt
+C:\Offline Server\arch\oper\oper-2026-07-18_20260718_173605.txt
+C:\Offline Server\arch\oper\oper-2026-07-18_20260718_174737.txt
+C:\Offline Server\arch\oper\oper-2026-07-19_20260719_103916.txt
+C:\Offline Server\arch\oper\oper-2026-07-19_20260719_103959.txt
+C:\Offline Server\core\config.py
+C:\Offline Server\core\sync_service.py
+C:\Offline Server\core\__init__.py
+C:\Offline Server\core\__pycache__
+C:\Offline Server\core\__pycache__\config.cpython-314.py
+C:\Offline Server\core\__pycache__\sync_service.cpython-314.pyc
+C:\Offline Server\core\__pycache__\__init__.cpython-314.py
+C:\Offline Server\core\__pycache__\__init__.cpython-314.pyc
+C:\Offline Server\db\manager.py
+C:\Offline Server\db\__init__.py
+C:\Offline Server\db\__pycache__
+C:\Offline Server\db\__pycache__\manager.cpython-314.py
+C:\Offline Server\db\__pycache__\manager.cpython-314.pyc
+C:\Offline Server\db\__pycache__\__init__.cpython-314.py
+C:\Offline Server\db\__pycache__\__init__.cpython-314.pyc
+C:\Offline Server\Dok\Offlain Server «¨á  § ¯ãâ « áì.txt
+C:\Offline Server\Dok\„¨ «®£GPT
+C:\Offline Server\Dok\„¨ «®£GPT\GPT.txt
+C:\Offline Server\Dok\„¨ «®£GPT\GPT_1.txt
+C:\Offline Server\Dok\„¨ «®£GPT\GPT_2.txt
+C:\Offline Server\Dok\„¨ «®£GPT\GPT_3.txt
+C:\Offline Server\Dok\„¨ «®£GPT\GPT_4 - ª®¯¨ï.txt
+C:\Offline Server\Dok\„¨ «®£GPT\GPT_4.txt
+C:\Offline Server\Make Dir\api
+C:\Offline Server\Make Dir\cafe.db
+C:\Offline Server\Make Dir\core
+C:\Offline Server\Make Dir\db
+C:\Offline Server\Make Dir\load.log
+C:\Offline Server\Make Dir\make_dir.bat
+C:\Offline Server\Make Dir\make_dir_2.bat
+C:\Offline Server\Make Dir\menu.html
+C:\Offline Server\Make Dir\models
+C:\Offline Server\Make Dir\qrs
+C:\Offline Server\Make Dir\spr
+C:\Offline Server\Make Dir\start_server.bat
+C:\Offline Server\Make Dir\static
+C:\Offline Server\Make Dir\templates
+C:\Offline Server\Make Dir\update_menu.bat
+C:\Offline Server\Make Dir\update_oper.bat
+C:\Offline Server\Make Dir\utils
+C:\Offline Server\Make Dir\api\main.py
+C:\Offline Server\Make Dir\api\__init__.py
+C:\Offline Server\Make Dir\api\__pycache__
+C:\Offline Server\Make Dir\core\config.py
+C:\Offline Server\Make Dir\core\__init__.py
+C:\Offline Server\Make Dir\core\__pycache__
+C:\Offline Server\Make Dir\db\manager.py
+C:\Offline Server\Make Dir\db\__init__.py
+C:\Offline Server\Make Dir\db\__pycache__
+C:\Offline Server\Make Dir\models\operator.py
+C:\Offline Server\Make Dir\models\transaction.py
+C:\Offline Server\Make Dir\models\__init__.py
+C:\Offline Server\Make Dir\spr\archiv_menu
+C:\Offline Server\Make Dir\spr\archiv_oper
+C:\Offline Server\Make Dir\templates\cashier.html
+C:\Offline Server\Make Dir\templates\default.html
+C:\Offline Server\Make Dir\templates\guest.html
+C:\Offline Server\Make Dir\utils\qr.py
+C:\Offline Server\Make Dir\utils\__init__.py
+C:\Offline Server\models\manager.py
+C:\Offline Server\models\operator.py
+C:\Offline Server\models\transaction.py
+C:\Offline Server\models\__init__.py
+C:\Offline Server\models\__pycache__
+C:\Offline Server\models\__pycache__\operator.cpython-314.pyc
+C:\Offline Server\models\__pycache__\transaction.cpython-314.pyc
+C:\Offline Server\models\__pycache__\__init__.cpython-314.pyc
+C:\Offline Server\spr\archiv_menu
+C:\Offline Server\spr\archiv_oper
+C:\Offline Server\spr\menu-2026-07-18.txt
+C:\Offline Server\spr\menu-2026-07-19.txt
+C:\Offline Server\spr\oper-2026-07-18.txt
+C:\Offline Server\spr\oper-2026-07-19.txt
+C:\Offline Server\spr\archiv_oper\oper-2026-07-19-132958.txt
+C:\Offline Server\spr\archiv_oper\oper-2026-07-19-133359.txt
+C:\Offline Server\spr\archiv_oper\oper-2026-07-19-134819.txt
+C:\Offline Server\static\qr_codes
+C:\Offline Server\static\qr_codes\qr_00_20260719.png
+C:\Offline Server\static\qr_codes\qr_01_20260719.png
+C:\Offline Server\static\qr_codes\qr_02_20260719.png
+C:\Offline Server\static\qr_codes\qr_03_20260719.png
+C:\Offline Server\static\qr_codes\qr_04_20260719.png
+C:\Offline Server\static\qr_codes\qr_05_20260719.png
+C:\Offline Server\static\qr_codes\qr_06_20260719.png
+C:\Offline Server\static\qr_codes\qr_07_20260719.png
+C:\Offline Server\static\qr_codes\qr_08_20260719.png
+C:\Offline Server\static\qr_codes\qr_09_20260719.png
+C:\Offline Server\static\qr_codes\qr_10_20260719.png
+C:\Offline Server\static\qr_codes\qr_11_20260719.png
+C:\Offline Server\static\qr_codes\qr_12_20260719.png
+C:\Offline Server\static\qr_codes\qr_13_20260719.png
+C:\Offline Server\static\qr_codes\qr_14_20260719.png
+C:\Offline Server\static\qr_codes\qr_15_20260719.png
+C:\Offline Server\static\qr_codes\qr_16_20260719.png
+C:\Offline Server\static\qr_codes\qr_17_20260719.png
+C:\Offline Server\static\qr_codes\qr_18_20260719.png
+C:\Offline Server\static\qr_codes\qr_19_20260719.png
+C:\Offline Server\static\qr_codes\qr_20_20260719.png
+C:\Offline Server\static\qr_codes\qr_21_20260719.png
+C:\Offline Server\static\qr_codes\qr_22_20260719.png
+C:\Offline Server\static\qr_codes\qr_23_20260719.png
+C:\Offline Server\static\qr_codes\qr_24_20260719.png
+C:\Offline Server\static\qr_codes\qr_25_20260719.png
+C:\Offline Server\static\qr_codes\qr_26_20260719.png
+C:\Offline Server\static\qr_codes\qr_27_20260719.png
+C:\Offline Server\static\qr_codes\qr_28_20260719.png
+C:\Offline Server\static\qr_codes\qr_29_20260719.png
+C:\Offline Server\static\qr_codes\qr_30_20260719.png
+C:\Offline Server\templates\cashier.html
+C:\Offline Server\templates\default.html
+C:\Offline Server\templates\guest.html
+C:\Offline Server\utils\access_rights.py
+C:\Offline Server\utils\qr.py
+C:\Offline Server\utils\qr_manager.py
+C:\Offline Server\utils\references.py
+C:\Offline Server\utils\template_loader.py
+C:\Offline Server\utils\__init__.py
+C:\Offline Server\utils\__pycache__
+C:\Offline Server\utils\__pycache__\access_rights.cpython-314.pyc
+C:\Offline Server\utils\__pycache__\qr_manager.cpython-314.pyc
+C:\Offline Server\utils\__pycache__\references.cpython-314.pyc
+C:\Offline Server\utils\__pycache__\template_loader.cpython-314.pyc
+C:\Offline Server\utils\__pycache__\__init__.cpython-314.pyc
+C:\Offline Server\__pycache__\main.cpython-314.pyc

@@ -1,0 +1,659 @@
+INFO:     Started server process [23748]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8099 (Press CTRL+C to quit)
+[OK] База данных успешно инициализирована.
+[OK] migrate_v1: расширенные таблицы и индексы применены.
+[OK] migrate_v2: расширения БД применены.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v4: оценка обслуживания.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51086 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51086 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51086 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51093 - "GET /api/director/block_pdf?block=sales&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2504, in director_block_pdf
+    rows, [22*mm, 14*mm, 13*mm, 62*mm, 18*mm, 15*mm, 18*mm, 33*mm],
+              ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51094 - "GET /api/director/block_pdf?block=queue&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2515, in director_block_pdf
+    [12*mm, 20*mm, 18*mm, 33*mm, 112*mm])
+        ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51095 - "GET /api/director/block_pdf?block=snapshot&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2528, in director_block_pdf
+    ["Показатель", "Значение"], rows, [90*mm, 85*mm])
+                                          ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51096 - "GET /api/director/block_pdf?block=tips&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2547, in director_block_pdf
+    rows, [60*mm, 35*mm, 35*mm, 45*mm],
+              ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51097 - "GET /api/director/block_pdf?block=discounts&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2569, in director_block_pdf
+    rows, [40*mm, 55*mm, 30*mm, 50*mm],
+              ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51098 - "GET /api/director/block_pdf?block=reservations&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2588, in director_block_pdf
+    rows, [15*mm, 30*mm, 32*mm, 28*mm, 14*mm, 16*mm, 30*mm, 18*mm])
+              ^^
+NameError: name 'mm' is not defined
+INFO:     127.0.0.1:51099 - "GET /api/director/block_pdf?block=bogus&oper_id=0 HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:51100 - "GET /api/director/block_pdf?block=sales&oper_id=999 HTTP/1.1" 403 Forbidden
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51086 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51086 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:51087 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51116 - "GET /api/director/block_pdf?block=sales&oper_id=0 HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\fastapi\routing.py", line 354, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Леонид\AppData\Local\Programs\Python\Python311\Lib\site-packages\anyio\_backends\_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Offline Server\api\main.py", line 2504, in director_block_pdf
+    rows, [22*mm, 14*mm, 13*mm, 62*mm, 18*mm, 15*mm, 18*mm, 33*mm],
+              ^^
+NameError: name 'mm' is not defined
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51087 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:51125 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51125 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:51152 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51088 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:51164 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51152 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:51180 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51180 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51180 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51180 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51180 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:51164 - "GET /api/orders/active?oper_id=31&view=waiter HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51180 - "GET /api/waiter/tables?oper_id=31 HTTP/1.1" 200 OK

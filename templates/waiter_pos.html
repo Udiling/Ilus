@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Пульт официанта</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background: #f4f6f8; }
+    .header { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-wrap: wrap; }
+    .header-id { font-weight: 700; font-size: 16px; }
+    .btn-exit {
+      width: 28px; height: 28px; padding: 0; background: #6c757d; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-exit:hover { background: #5c636a; }
+    .btn-exit svg { width: 16px; height: 16px; display: block; }
+    .table-btns { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; flex: 1; }
+    .tbl-btn {
+      position: relative; min-width: 58px; height: 34px; padding: 0 4px;
+      border: 1px solid #adb5bd; border-radius: 6px; cursor: pointer;
+      font-size: 11px; font-weight: 700; overflow: hidden; line-height: 1.1;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .tbl-btn .segs { position: absolute; inset: 0; display: flex; }
+    .tbl-btn .seg { flex: 1; }
+    .tbl-btn .tbl-label { position: relative; z-index: 1; pointer-events: none; padding: 0 2px; text-align: center; }
+    .tbl-free { background: #adb5bd; color: #fff; border-color: #868e96; }
+    .tbl-busy { background: #fff; color: #212529; }
+    .tbl-call { background: #dc3545; color: #fff; border-color: #b02a37; }
+    .tbl-pay { background: #ffc107; color: #212529; border-color: #e0a800; }
+    .tbl-ready { background: #198754; color: #fff; border-color: #146c43; }
+    .tbl-split { background: #fff; color: #212529; }
+    .seg-idle { background: #ced4da; }
+    .seg-call { background: #dc3545; }
+    .seg-pay { background: #ffc107; }
+    .seg-ready { background: #198754; }
+    .tbl-split.tbl-split-light { color: #fff; text-shadow: 0 0 3px #000; }
+    .btn-reserve {
+      background: #0a58ca; color: #fff; border: none; padding: 6px 10px;
+      border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; flex-shrink: 0;
+    }
+    .btn-reserve:hover { background: #084298; }
+    .res-overlay, .remind-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      display: none; align-items: center; justify-content: center; z-index: 1100;
+    }
+    .res-box, .remind-box {
+      background: #fff; padding: 18px; border-radius: 12px; width: 340px;
+      max-width: calc(100vw - 24px); box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .res-box h3, .remind-box h3 { margin: 0 0 10px; font-size: 17px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 8px 0; }
+    .cal-cell {
+      text-align: center; padding: 6px 0; font-size: 12px; border-radius: 4px;
+      border: 1px solid #eee; background: #f8f9fa; cursor: pointer;
+    }
+    .cal-cell.head { font-weight: 700; background: none; border: none; cursor: default; color: #6c757d; }
+    .cal-cell.off { color: #adb5bd; cursor: default; background: #f1f3f5; }
+    .cal-cell.sel { background: #0a58ca; color: #fff; border-color: #0a58ca; }
+    .res-box label { display: block; font-size: 13px; color: #495057; margin: 8px 0 4px; }
+    .res-box input, .res-box select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    .res-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+    .res-actions button, .remind-box button { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .remind-list { font-size: 14px; line-height: 1.5; max-height: 240px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; }
+    .btn-serve { background: #0a58ca; color: #fff; border: none; padding: 8px 14px; border-radius: 5px; cursor: pointer; font-weight: 500; }
+    .btn-serve:hover { background: #084298; }
+    .empty { text-align: center; padding: 20px; color: #6c757d; }
+    #auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 999; }
+    .auth-box { background: #fff; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .auth-box input { padding: 10px; font-size: 16px; width: 220px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    .auth-box button { padding: 10px 20px; background: #0a58ca; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+
+    .cash-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .cash-box { background: #fff; padding: 20px; border-radius: 12px; min-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .cash-box h3 { margin: 0 0 12px; font-size: 17px; }
+    .cash-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; }
+    .cash-row.due b { color: #d6336c; font-size: 18px; }
+    .cash-row.change b { color: #198754; font-size: 20px; }
+    .cash-box input { width: 100%; padding: 10px; font-size: 18px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-top: 4px; }
+    .cash-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    .cash-actions button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .pay-method-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 999; }
+    .pay-method-box { background: #fff; padding: 20px; border-radius: 12px; min-width: 280px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); text-align: center; }
+    .pay-method-box h3 { margin: 0 0 8px; }
+    .pay-method-sum { color: #d6336c; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .pay-tips-row { text-align: left; margin-bottom: 12px; }
+    .pay-tips-row label { font-size: 13px; color: #495057; display: block; margin-bottom: 4px; }
+    .pay-tips-row input { width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    .pay-total-row { font-size: 14px; color: #212529; margin-bottom: 12px; }
+    .pay-total-row b { font-size: 17px; color: #0a58ca; }
+    .pay-method-btns { display: flex; flex-direction: column; gap: 8px; }
+    .pay-method-btns button { padding: 12px 16px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; color: #fff; }
+    .pay-btn-cash { background: #198754; }
+    .pay-btn-card { background: #0a58ca; }
+    .pay-btn-transfer { background: #6f42c1; }
+    .pay-method-cancel { margin-top: 10px; background: none; border: none; color: #6c757d; cursor: pointer; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <div id="auth-overlay">
+    <div class="auth-box">
+      <h2>Вход для официанта</h2>
+      <p>Допуск: ID 31–40, 0, 52, 77</p>
+      <input type="text" id="login-id" placeholder="Ваш ID">
+      <br>
+      <button onclick="checkAccess()">Войти</button>
+    </div>
+  </div>
+
+  <div id="app" style="filter:blur(3px); pointer-events:none;">
+    <div class="header">
+      <span class="header-id" id="display-id">—</span>
+      <button type="button" class="btn-exit" title="Выход" aria-label="Выход" onclick="logoutWaiter()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+      <div id="table-btns" class="table-btns"></div>
+      <button type="button" id="btn-banquet" onclick="openBanquetModal()" style="background:#6f42c1;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:bold;cursor:pointer;display:block;margin:0 auto 6px">🥂 Банкет</button>
+      <button type="button" class="btn-reserve" id="btn-reserve" onclick="openReserveModal()">Бронь</button>
+      <span style="margin-left:auto; font-size:12px; color:#888;">ТМ Кафе_Илюс</span>
+    </div>
+
+    <table id="waiter-tbl">
+      <thead><tr><th>Заказ</th><th>Стол</th><th>Позиция</th><th>К-во</th><th>Точка</th><th>Действие</th></tr></thead>
+      <tbody><tr><td colspan="6" class="empty">Загрузка...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div id="pay-method-overlay" class="pay-method-overlay">
+    <div class="pay-method-box">
+      <h3>Стол <span id="pay-method-table">—</span></h3>
+      <div class="pay-method-sum">К оплате: <span id="pay-method-due">0</span> ₽</div>
+      <div class="pay-tips-row">
+        <label for="pay-tips">Чаевые (необязательно):</label>
+        <input id="pay-tips" type="number" min="0" step="1" placeholder="0" value="">
+      </div>
+      <div class="pay-total-row">Итого с чаевыми: <b id="pay-method-total">0</b> ₽</div>
+      <div class="pay-method-btns">
+        <button type="button" id="pay-cash" class="pay-btn-cash">💵 Наличные</button>
+        <button type="button" id="pay-card" class="pay-btn-card">💳 Карта</button>
+        <button type="button" id="pay-transfer" class="pay-btn-transfer">🏦 Перевод</button>
+      </div>
+      <button type="button" id="pay-method-cancel" class="pay-method-cancel">Отмена</button>
+    </div>
+  </div>
+
+  <div id="cash-overlay" class="cash-overlay">
+    <div class="cash-box">
+      <h3 id="cash-title">Оплата наличными</h3>
+      <div class="cash-row due"><span>Заказ:</span><b id="cash-due">0</b> ₽</div>
+      <div class="cash-row"><span>Чаевые:</span><b id="cash-tips">0</b> ₽</div>
+      <div class="cash-row due"><span>Итого:</span><b id="cash-total">0</b> ₽</div>
+      <label>Получено от гостя:</label>
+      <input id="cash-received" type="number" min="0" step="1" placeholder="0">
+      <div class="cash-row change"><span>Сдача:</span><b id="cash-change">0</b> ₽</div>
+      <div class="cash-actions">
+        <button type="button" id="cash-cancel" style="background:#6c757d;color:#fff">Отмена</button>
+        <button type="button" id="cash-ok" style="background:#198754;color:#fff" disabled>Принять</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="res-overlay" class="res-overlay">
+    <div class="res-box">
+      <h3>Бронь стола</h3>
+      <div id="res-cal"></div>
+      <div id="res-step-time" style="display:none">
+        <label for="res-time">Время</label>
+        <input id="res-time" type="time" step="60">
+      </div>
+      <div id="res-step-table" style="display:none">
+        <label for="res-table">Свободный стол</label>
+        <select id="res-table"><option value="">—</option></select>
+      </div>
+      <div id="res-step-guest" style="display:none">
+        <label for="res-phone">№ телефона</label>
+        <input id="res-phone" type="tel" placeholder="+7...">
+        <label for="res-name">Имя клиента</label>
+        <input id="res-name" type="text" placeholder="Имя">
+      </div>
+      <div id="res-existing" style="display:none;margin-top:8px;border:1px solid #dee2e6;border-radius:8px;background:#f8f9fa;max-height:140px;overflow:auto;font-size:12px;color:#495057"></div>
+      <div class="res-actions">
+        <button type="button" onclick="closeReserveModal()" style="background:#6c757d;color:#fff">Отмена</button>
+        <button type="button" id="res-save" style="background:#198754;color:#fff;display:none">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ord-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1200;overflow:auto">
+    <div style="background:#fff;max-width:680px;margin:24px auto;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-family:monospace,'Courier New',monospace">
+      <div style="padding:14px 18px;border-bottom:2px dashed #dee2e6;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-size:16px;font-weight:bold">ЧЕК · ПРЕДЗАКАЗ</div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <label>Гостей: <input id="ord-guests" type="number" min="0" step="1" value="0" style="width:64px"></label>
+          <label style="font-weight:bold;color:#dc3545"><input id="ord-closed" type="checkbox"> Закрытое мероприятие</label>
+        </div>
+        <div style="font-size:18px;font-weight:bold">Итого: <span id="ord-total">0.00</span> ₽</div>
+      </div>
+      <div style="display:flex;gap:8px;padding:10px 18px;border-bottom:1px solid #dee2e6;flex-wrap:wrap">
+        <select id="ord-menu-sel" onchange="ordOnMenuPick()" style="flex:1;min-width:260px;padding:8px;border:1px solid #dee2e6;border-radius:8px"></select>
+        <button type="button" onclick="ordAddSelected()" style="background:#0a58ca;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:bold">+ Добавить</button>
+      </div>
+      <div id="ord-cats" style="display:flex;gap:6px;padding:8px 18px;flex-wrap:wrap"></div>
+      <div id="ord-existing" style="margin:0 18px 8px;border:1px solid #dee2e6;border-radius:8px;background:#f8f9fa;max-height:120px;overflow:auto;font-size:12px;color:#495057"></div>
+      <div id="ord-cart" style="padding:10px 18px;min-height:80px"></div>
+      <div style="padding:12px 18px;border-top:2px dashed #dee2e6">
+        <label>Аванс, ₽: <input id="ord-adv" type="number" min="0" step="0.01" value="0" style="width:100px"></label>
+        <div style="margin:8px 0 4px;font-weight:bold">Аванс (принятая оплата):</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <button type="button" onclick="ordSetAdv(1)" style="background:#198754;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px">Вся сумма</button>
+          <button type="button" onclick="ordSetAdv(0.5)" style="background:#0a58ca;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px">50%</button>
+          <button type="button" onclick="ordSetAdv(0)" style="background:#6c757d;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px">Без аванса</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="ord-pay" data-m="Наличные" style="background:#198754;color:#fff;border:none;border-radius:8px;padding:8px 12px">💵 Наличные</button>
+          <button type="button" class="ord-pay" data-m="Карта" style="background:#0a58ca;color:#fff;border:none;border-radius:8px;padding:8px 12px">💳 Карта</button>
+          <button type="button" class="ord-pay" data-m="Перевод" style="background:#6f42c1;color:#fff;border:none;border-radius:8px;padding:8px 12px">🏦 Перевод</button>
+          <button type="button" id="ord-pay-mix" style="background:#ffc107;color:#212529;border:none;border-radius:8px;padding:8px 12px;font-weight:bold">🔀 Комбинированная</button>
+        </div>
+        <div id="ord-mix-box" style="display:none;margin-top:8px"></div>
+        <div id="ord-adv-method" style="margin-top:8px;font-weight:bold"></div>
+        <div id="ord-due" style="margin-top:4px"></div>
+      </div>
+      <div style="display:flex;gap:8px;padding:12px 18px;flex-wrap:wrap">
+        <button type="button" onclick="closeOrderForm()" style="background:#6c757d;color:#fff;border:none;border-radius:8px;padding:10px 16px">Отмена</button>
+        <button type="button" id="ord-save" onclick="saveReservationOrder()" style="background:#198754;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:bold">💾 Сохранить бронь с заказом</button>
+        <button type="button" id="ord-pdf" onclick="orderPdf()" style="display:none;background:#dc3545;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:bold">📄 Сформировать PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cancelreq-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1300;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:520px;width:92%;box-shadow:0 8px 24px rgba(0,0,0,0.3)">
+      <h3 style="margin:0 0 10px;color:#dc3545">Отмена брони</h3>
+      <div id="cancelreq-text" style="font-size:14px;font-weight:bold;margin-bottom:10px"></div>
+      <div style="margin-bottom:8px">
+        <label style="display:block;font-size:13px">Инициатор отмены:</label>
+        <label style="font-size:13px"><input type="radio" name="cancelreq-init" value="client" checked onchange="cancelreqToggleTime()"> Клиент</label>
+        <label style="font-size:13px;margin-left:12px"><input type="radio" name="cancelreq-init" value="cafe" onchange="cancelreqToggleTime()"> Кафе</label>
+      </div>
+      <div id="cancelreq-time-row" style="display:none;margin-bottom:8px">
+        <label style="display:block;font-size:13px">Время уведомления (ДД.ММ.ГГ ЧЧ:ММ):</label>
+        <input id="cancelreq-notify" type="datetime-local" style="padding:6px;border:1px solid #dee2e6;border-radius:6px">
+      </div>
+      <label style="display:block;font-size:13px">Личный ПИН (директор 7777 / бармен 4444):</label>
+      <input id="cancelreq-pin" type="password" maxlength="4" style="padding:6px;border:1px solid #dee2e6;border-radius:6px;width:120px">
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button type="button" onclick="document.getElementById('cancelreq-overlay').style.display='none'" style="background:#6c757d;color:#fff;border:none;border-radius:8px;padding:10px 16px">Отмена</button>
+        <button type="button" onclick="cancelreqConfirm()" style="background:#dc3545;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:bold">✅ Подтвердить отмену</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="remind-overlay" class="remind-overlay">
+    <div class="remind-box">
+      <h3 id="remind-title">Напоминание</h3>
+      <div id="remind-body" class="remind-list"></div>
+      <div class="res-actions">
+        <button type="button" onclick="closeRemindModal()" style="background:#0a58ca;color:#fff">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="beep" src="/static/beep.mp3" preload="auto"></audio>
+
+<script>
+  const ALLOWED_IDS = ['0','52','77','31','32','33','34','35','36','37','38','39','40'];
+  let currentOper = localStorage.getItem('w_oper') || '';
+  let tableStates = [];
+  let resDate = '';
+  let remindQueue = [];
+
+  function logoutWaiter() {
+    localStorage.removeItem('w_oper');
+    location.reload();
+  }
+
+  function checkAccess() {
+    const id = document.getElementById('login-id').value.trim();
+    if (ALLOWED_IDS.includes(id)) {
+      currentOper = id;
+      localStorage.setItem('w_oper', id);
+      document.getElementById('display-id').textContent = id;
+      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('app').style.filter = 'none';
+      document.getElementById('app').style.pointerEvents = 'auto';
+      loadOrders();
+      setInterval(loadOrders, 3000);
+      checkBartenderReminders(true);
+      setInterval(() => checkBartenderReminders(false), 30000);
+    } else {
+      alert('❌ Доступ запрещён. Разрешены ID: 31-40, 0, 52, 77');
+    }
+  }
+
+  if (currentOper && ALLOWED_IDS.includes(currentOper)) {
+    document.getElementById('login-id').value = currentOper;
+    checkAccess();
+  }
+
+  function showPayMethodModal(due, tableId) {
+    return new Promise((resolve, reject) => {
+      const ov = document.getElementById('pay-method-overlay');
+      const dueNum = Math.max(0, Number(due) || 0);
+      const dueEl = document.getElementById('pay-method-due');
+      const tipsEl = document.getElementById('pay-tips');
+      const totalEl = document.getElementById('pay-method-total');
+      dueEl.textContent = dueNum.toFixed(0);
+      document.getElementById('pay-method-table').textContent = tableId;
+      tipsEl.value = '';
+      totalEl.textContent = dueNum.toFixed(0);
+      ov.style.display = 'flex';
+
+      function updateTotal() {
+        const tips = parseFloat(String(tipsEl.value).replace(',', '.')) || 0;
+        totalEl.textContent = (dueNum + Math.max(0, tips)).toFixed(0);
+      }
+      tipsEl.oninput = updateTotal;
+
+      const cleanup = () => { ov.style.display = 'none'; tipsEl.oninput = null; };
+      const getTips = () => Math.max(0, parseFloat(String(tipsEl.value).replace(',', '.')) || 0);
+      document.getElementById('pay-cash').onclick = () => { cleanup(); resolve({ method: 'cash', tips: getTips() }); };
+      document.getElementById('pay-card').onclick = () => { cleanup(); resolve({ method: 'card', tips: getTips() }); };
+      document.getElementById('pay-transfer').onclick = () => { cleanup(); resolve({ method: 'transfer', tips: getTips() }); };
+      document.getElementById('pay-method-cancel').onclick = () => { cleanup(); reject(new Error('cancel')); };
+    });
+  }
+
+  function showCashPayModal(orderDue, tips, title) {
+    return new Promise((resolve, reject) => {
+      const ov = document.getElementById('cash-overlay');
+      const dueEl = document.getElementById('cash-due');
+      const tipsEl = document.getElementById('cash-tips');
+      const totalEl = document.getElementById('cash-total');
+      const recvEl = document.getElementById('cash-received');
+      const changeEl = document.getElementById('cash-change');
+      const btnOk = document.getElementById('cash-ok');
+      const btnCancel = document.getElementById('cash-cancel');
+      const due = Math.max(0, Number(orderDue) || 0);
+      const tip = Math.max(0, Number(tips) || 0);
+      const total = due + tip;
+      document.getElementById('cash-title').textContent = title || 'Оплата наличными';
+      dueEl.textContent = due.toFixed(0);
+      tipsEl.textContent = tip.toFixed(0);
+      totalEl.textContent = total.toFixed(0);
+      recvEl.value = '';
+      changeEl.textContent = '0';
+      btnOk.disabled = true;
+      ov.style.display = 'flex';
+      setTimeout(() => recvEl.focus(), 50);
+
+      function updateChange() {
+        const received = parseFloat(String(recvEl.value).replace(',', '.')) || 0;
+        const change = received - total;
+        if (received <= 0) {
+          changeEl.textContent = '0';
+          btnOk.disabled = true;
+          return;
+        }
+        changeEl.textContent = change >= 0 ? change.toFixed(0) : '—';
+        changeEl.style.color = change >= 0 ? '#198754' : '#dc3545';
+        btnOk.disabled = received < total;
+      }
+
+      recvEl.oninput = updateChange;
+      btnOk.onclick = () => {
+        const received = parseFloat(String(recvEl.value).replace(',', '.')) || 0;
+        if (received < total) return;
+        ov.style.display = 'none';
+        resolve({ amount: due, tips: tip, received, change: received - total, total });
+      };
+      btnCancel.onclick = () => {
+        ov.style.display = 'none';
+        reject(new Error('cancel'));
+      };
+    });
+  }
+
+  function tableLabel(t) {
+    if (!t.occupied) return String(t.table_id);
+    let s = t.table_id + '/' + (t.issued_pct || 0) + '%';
+    if (t.fully_served) {
+      const n = t.receipt_count || 1;
+      s += ' ' + (n <= 1 ? 'Р' : ('Р' + n));
+    }
+    return s;
+  }
+
+  function renderTableButtons(list) {
+    const box = document.getElementById('table-btns');
+    if (!box) return;
+    box.innerHTML = '';
+    (list || []).forEach(t => {
+      const call = !!t.calling;
+      const pay = !!t.paying;
+      const ready = !!t.fully_served;
+      const flags = [call, pay, ready].filter(Boolean).length;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tbl-btn';
+      btn.dataset.tid = t.table_id;
+      if (flags >= 2) {
+        btn.classList.add('tbl-split');
+        if (ready || call) btn.classList.add('tbl-split-light');
+        const segs = document.createElement('div');
+        segs.className = 'segs';
+        [['call', call], ['pay', pay], ['ready', ready]].forEach(([name, on]) => {
+          const seg = document.createElement('span');
+          seg.className = 'seg ' + (on ? ('seg-' + name) : 'seg-idle');
+          seg.dataset.seg = name;
+          segs.appendChild(seg);
+        });
+        btn.appendChild(segs);
+      } else if (!t.occupied) {
+        btn.classList.add('tbl-free');
+      } else if (call) {
+        btn.classList.add('tbl-call');
+      } else if (pay) {
+        btn.classList.add('tbl-pay');
+      } else if (ready) {
+        btn.classList.add('tbl-ready');
+      } else {
+        btn.classList.add('tbl-busy');
+      }
+      const lab = document.createElement('span');
+      lab.className = 'tbl-label';
+      lab.textContent = tableLabel(t);
+      btn.appendChild(lab);
+      btn.onclick = (e) => onTableBtnClick(t, e);
+      box.appendChild(btn);
+    });
+  }
+
+  function onTableBtnClick(t, e) {
+    const seg = e.target && e.target.dataset ? e.target.dataset.seg : '';
+    if (seg === 'call' && t.calling) {
+      ackSignal(t.table_id, 'call');
+      return;
+    }
+    if ((seg === 'pay' && t.paying) || (seg === 'ready' && t.fully_served)) {
+      settleTable(t);
+      return;
+    }
+    if (!seg) {
+      if (t.fully_served || t.paying) settleTable(t);
+      else if (t.calling) ackSignal(t.table_id, 'call');
+    }
+  }
+
+  function ackSignal(tableId, kind) {
+    const fd = new FormData();
+    fd.append('table_id', String(tableId));
+    fd.append('kind', kind || 'all');
+    fd.append('oper_id', currentOper);
+    fetch('/api/waiter/ack-signal', { method: 'POST', body: fd })
+      .then(() => loadTableButtons())
+      .catch(() => {});
+  }
+
+  function loadTableButtons() {
+    return fetch('/api/waiter/tables?oper_id=' + encodeURIComponent(currentOper))
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        tableStates = Array.isArray(data) ? data : [];
+        renderTableButtons(tableStates);
+      })
+      .catch(() => {});
+  }
+
+  function ymd(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  function renderCalendar() {
+    const box = document.getElementById('res-cal');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const last = new Date(today);
+    last.setDate(last.getDate() + 30);
+    const start = new Date(today);
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+    let html = '<div class="cal-grid">';
+    ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(h => {
+      html += '<div class="cal-cell head">' + h + '</div>';
+    });
+    const cursor = new Date(start);
+    for (let i = 0; i < 42; i++) {
+      const ds = ymd(cursor);
+      const inRange = cursor >= today && cursor <= last;
+      const sel = ds === resDate ? ' sel' : '';
+      const off = inRange ? '' : ' off';
+      html += '<div class="cal-cell' + off + sel + '" data-day="' + (inRange ? ds : '') + '">' + cursor.getDate() + '</div>';
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    html += '</div>';
+    box.innerHTML = html;
+    box.querySelectorAll('.cal-cell[data-day]').forEach(el => {
+      if (!el.dataset.day) return;
+      el.onclick = () => {
+        resDate = el.dataset.day;
+        renderCalendar();
+        document.getElementById('res-step-time').style.display = 'block';
+        document.getElementById('res-time').focus();
+        renderExistingHint();
+      };
+    });
+  }
+
+  let resMode = 'reserve'; // 'reserve' | 'banquet'
+
+  function openReserveModal() {
+    resMode = 'reserve';
+    resDate = '';
+    document.getElementById('res-time').value = '';
+    document.getElementById('res-table').innerHTML = '<option value="">—</option>';
+    document.getElementById('res-phone').value = '';
+    document.getElementById('res-name').value = '';
+    document.getElementById('res-step-time').style.display = 'none';
+    document.getElementById('res-step-table').style.display = 'none';
+    document.getElementById('res-step-guest').style.display = 'none';
+    document.getElementById('res-save').style.display = 'none';
+    document.getElementById('res-existing').style.display = 'none';
+    renderCalendar();
+    document.getElementById('res-overlay').style.display = 'flex';
+  }
+
+  function openBanquetModal() {
+    openReserveModal();
+    resMode = 'banquet';
+    document.getElementById('res-save').style.display = 'none';
+  }
+
+  function renderExistingHint() {
+    if (!resDate) return;
+    fetch('/api/reservations?day=' + encodeURIComponent(resDate))
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const items = ((d && d.items) || [])
+          .filter(x => (x.status || 'Активна') !== 'Отменен')
+          .sort((a, b) => String(a.res_time).localeCompare(String(b.res_time)));
+        const fmtDt = iso => { const p = iso.split('-'); return p[2] + '.' + p[1] + '.' + p[0].slice(2); };
+        const html = items.length
+          ? '<div style="padding:6px 8px;border-bottom:1px solid #dee2e6;font-weight:bold">Уже есть активные брони:</div>' +
+            items.map(x => '<div style="padding:4px 8px">' + fmtDt(x.res_date) + '_' + String(x.res_time).slice(0, 5) + '_' +
+              (Number(x.is_closed_event) ? 'Банкет' : ('Table_' + x.table_id)) +
+              (Number(x.is_closed_event) ? '' : (' · ' + (x.phone || '') + ' · ' + (x.guest_name || ''))) + '</div>').join('')
+          : '<div style="padding:6px 8px">Активных броней на эту дату нет</div>';
+        const r1 = document.getElementById('res-existing');
+        r1.innerHTML = html; r1.style.display = 'block';
+        const r2 = document.getElementById('ord-existing');
+        if (r2) { r2.innerHTML = html; r2.style.display = 'block'; }
+      })
+      .catch(() => {});
+  }
+
+  function closeReserveModal() {
+    document.getElementById('res-overlay').style.display = 'none';
+  }
+
+  function loadFreeTables() {
+    const tm = (document.getElementById('res-time').value || '').trim();
+    if (!resDate || !tm) return;
+    fetch('/api/reservations/free?res_date=' + encodeURIComponent(resDate) + '&res_time=' + encodeURIComponent(tm))
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        const sel = document.getElementById('res-table');
+        sel.innerHTML = '<option value="">Выберите стол</option>';
+        if (!ok) throw new Error(d.detail || 'Ошибка');
+        (d.free || []).forEach(n => {
+          const opt = document.createElement('option');
+          opt.value = n;
+          opt.textContent = 'Стол ' + n;
+          sel.appendChild(opt);
+        });
+        document.getElementById('res-step-table').style.display = 'block';
+      })
+      .catch(e => alert('❌ ' + e.message));
+  }
+
+  document.getElementById('res-time')?.addEventListener('change', loadFreeTables);
+  document.getElementById('res-table')?.addEventListener('change', () => {
+    const v = document.getElementById('res-table').value;
+    document.getElementById('res-step-guest').style.display = v ? 'block' : 'none';
+    const btnSave = document.getElementById('res-save');
+    if (resMode === 'banquet') {
+      btnSave.textContent = 'Далее → Банкет';
+      btnSave.onclick = openOrderForm;
+      btnSave.style.display = v ? 'inline-block' : 'none';
+    } else {
+      btnSave.textContent = 'Сохранить';
+      btnSave.onclick = saveReservation;
+      btnSave.style.display = v ? 'inline-block' : 'none';
+    }
+  });
+
+  function saveReservation() {
+    const tm = (document.getElementById('res-time').value || '').trim();
+    const tid = document.getElementById('res-table').value;
+    const phone = document.getElementById('res-phone').value.trim();
+    const name = document.getElementById('res-name').value.trim();
+    if (!resDate || !tm || !tid) return alert('Выберите дату, время и стол');
+    if (!phone || !name) return alert('Укажите телефон и имя');
+    const fd = new FormData();
+    fd.append('table_id', tid);
+    fd.append('res_date', resDate);
+    fd.append('res_time', tm);
+    fd.append('phone', phone);
+    fd.append('guest_name', name);
+    fd.append('oper_id', currentOper);
+    fetch('/api/reservations', { method: 'POST', body: fd })
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!ok) throw new Error(d.detail || 'Ошибка брони');
+        closeReserveModal();
+        alert('✅ Бронь: стол ' + tid + ', ' + resDate + ' ' + tm + ' (1 час)');
+      })
+      .catch(e => alert('❌ ' + e.message));
+  }
+
+  // ===== Предзаказ (банкет) =====
+  let ordMenu = [];
+  let ordCart = [];
+  let ordCat = '';
+  let ordAdvMethod = '';
+  let ordSavedId = 0;
+
+  function ordFmt(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+
+  function openOrderForm() {
+    const tm = (document.getElementById('res-time').value || '').trim();
+    const tid = document.getElementById('res-table').value;
+    const phone = document.getElementById('res-phone').value.trim();
+    const name = document.getElementById('res-name').value.trim();
+    if (!resDate || !tm || !tid) return alert('Сначала выберите дату, время и стол');
+    if (!phone || !name) return alert('Сначала укажите телефон и имя');
+    renderExistingHint();
+    ordCart = [];
+    ordCat = '';
+    ordAdvMethod = '';
+    ordSavedId = 0;
+    // Если на этот стол/время уже есть бронь (создана кнопкой «Сохранить») — обновляем её, а не создаём новую
+    fetch('/api/reservations?day=' + encodeURIComponent(resDate))
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const hit = ((d && d.items) || []).find(x =>
+          String(x.table_id) === String(tid) && String(x.res_time).slice(0, 5) === tm.slice(0, 5));
+        if (hit) {
+          ordSavedId = hit.id;
+          document.getElementById('ord-guests').value = hit.guests_count || 0;
+          document.getElementById('ord-closed').checked = !!Number(hit.is_closed_event);
+          document.getElementById('ord-adv').value = Number(hit.advance_amount) || 0;
+          if (hit.advance_method) ordAdvMethod = hit.advance_method;
+        }
+      })
+      .catch(() => {});
+    document.getElementById('ord-guests').value = 0;
+    document.getElementById('ord-closed').checked = false;
+    document.getElementById('ord-adv').value = 0;
+    document.getElementById('ord-mix-box').style.display = 'none';
+    document.getElementById('ord-mix-box').innerHTML = '';
+    document.getElementById('ord-adv-method').textContent = '';
+    document.getElementById('ord-pdf').style.display = 'none';
+    document.getElementById('ord-save').style.display = 'inline-block';
+    document.getElementById('ord-overlay').style.display = 'block';
+    if (!ordMenu.length) {
+      fetch('/api/menu?oper_id=' + encodeURIComponent(currentOper))
+        .then(r => r.ok ? r.json() : [])
+        .then(d => { ordMenu = Array.isArray(d) ? d : (d.items || []); renderOrdCats(); renderOrdCart(); })
+        .catch(() => {});
+    } else { renderOrdCats(); renderOrdCart(); }
+  }
+
+  function closeOrderForm() { document.getElementById('ord-overlay').style.display = 'none'; }
+
+  function renderOrdCats() {
+    const cats = [...new Set(ordMenu.map(m => m.category || 'Прочее'))];
+    if (!ordCat && cats.length) ordCat = cats[0];
+    const box = document.getElementById('ord-cats');
+    box.innerHTML = '';
+    cats.forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = c;
+      b.style.cssText = 'border:1px solid #dee2e6;border-radius:16px;padding:4px 12px;font-size:12px;background:' + (c === ordCat ? '#0a58ca;color:#fff' : '#f8f9fa;color:#495057');
+      b.onclick = () => { ordCat = c; renderOrdCats(); };
+      box.appendChild(b);
+    });
+    const sel = document.getElementById('ord-menu-sel');
+    sel.innerHTML = '<option value="">— выберите позицию —</option>';
+    ordMenu.filter(m => (m.category || 'Прочее') === ordCat && m.is_active !== 0)
+      .forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name_id;
+        opt.textContent = `${m.name} · ${ordFmt(m.price)} ₽`;
+        sel.appendChild(opt);
+      });
+  }
+
+  function ordOnMenuPick() { /* выбор уже отражён в select; добавление по кнопке */ }
+
+  function ordAddSelected() {
+    const sel = document.getElementById('ord-menu-sel');
+    const nid = sel.value;
+    if (!nid) return;
+    ordAddItem(nid);
+    sel.value = '';
+  }
+
+  function ordAddItem(nameId) {
+    const m = ordMenu.find(x => String(x.name_id) === String(nameId));
+    if (!m) return;
+    const line = ordCart.find(x => String(x.name_id) === String(nameId));
+    if (line) line.qty++;
+    else ordCart.push({ name_id: m.name_id, name: m.name, price: Number(m.price), qty: 1 });
+    renderOrdCart();
+  }
+
+  function ordChangeQty(nameId, delta) {
+    const line = ordCart.find(x => String(x.name_id) === String(nameId));
+    if (!line) return;
+    line.qty += delta;
+    if (line.qty <= 0) ordCart = ordCart.filter(x => x !== line);
+    renderOrdCart();
+  }
+
+  function ordTotal() { return ordCart.reduce((s, i) => s + i.price * i.qty, 0); }
+
+  function renderOrdCart() {
+    const box = document.getElementById('ord-cart');
+    if (!ordCart.length) {
+      box.innerHTML = '<div style="color:#6c757d;text-align:center;padding:18px">Корзина пуста — выберите позицию из меню выше</div>';
+    } else {
+      let html = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
+      ordCart.forEach(i => {
+        html += `<tr style="border-bottom:1px dashed #dee2e6">
+          <td style="padding:6px 4px">${i.name}</td>
+          <td style="padding:6px 4px;white-space:nowrap">${ordFmt(i.price)} ×
+            <button type="button" onclick="ordChangeQty('${i.name_id}',-1)" style="border:1px solid #dee2e6;border-radius:6px;width:26px;height:26px;background:#f8f9fa">−</button>
+            <b>${i.qty}</b>
+            <button type="button" onclick="ordChangeQty('${i.name_id}',1)" style="border:1px solid #dee2e6;border-radius:6px;width:26px;height:26px;background:#f8f9fa">+</button>
+          </td>
+          <td style="padding:6px 4px;text-align:right;font-weight:bold">${ordFmt(i.price * i.qty)} ₽</td></tr>`;
+      });
+      html += '</table>';
+      box.innerHTML = html;
+    }
+    renderOrdSums();
+  }
+
+  function renderOrdSums() {
+    const total = ordTotal();
+    const adv = Number(document.getElementById('ord-adv').value) || 0;
+    document.getElementById('ord-total').textContent = ordFmt(total);
+    document.getElementById('ord-adv-method').textContent = ordAdvMethod ? 'Аванс: ' + ordAdvMethod : '';
+    document.getElementById('ord-due').innerHTML = 'Аванс: <b>' + ordFmt(adv) + ' ₽</b> · К оплате: <b>' + ordFmt(Math.max(total - adv, 0)) + ' ₽</b>';
+  }
+
+  function ordSetAdv(frac) {
+    document.getElementById('ord-adv').value = ordFmt(ordTotal() * frac);
+    renderOrdSums();
+  }
+
+  document.querySelectorAll('#ord-overlay .ord-pay').forEach(b => {
+    b.onclick = () => { ordAdvMethod = b.dataset.m; renderOrdSums(); };
+  });
+
+  document.getElementById('ord-adv')?.addEventListener('input', renderOrdSums);
+
+  document.getElementById('ord-pay-mix')?.addEventListener('click', () => {
+    const box = document.getElementById('ord-mix-box');
+    if (box.style.display === 'none') {
+      box.innerHTML = `
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <select id="ord-mix-m" style="padding:6px">
+            <option>Наличные</option><option>Карта</option><option>Перевод</option>
+          </select>
+          <input id="ord-mix-sum" type="number" min="0" step="0.01" placeholder="сумма" style="width:100px;padding:6px">
+          <button type="button" id="ord-mix-add" style="border:none;border-radius:6px;padding:6px 12px;background:#0a58ca;color:#fff">+</button>
+          <span id="ord-mix-parts" style="font-weight:bold"></span>
+        </div>`;
+      box.style.display = 'block';
+      let parts = [];
+      const upd = () => { document.getElementById('ord-mix-parts').textContent = ' ' + parts.join(' + '); };
+      document.getElementById('ord-mix-add').onclick = () => {
+        const m = document.getElementById('ord-mix-m').value;
+        const s = Number(document.getElementById('ord-mix-sum').value) || 0;
+        if (s > 0) { parts.push(`${m}: ${ordFmt(s)}`); upd(); }
+        document.getElementById('ord-mix-sum').value = '';
+      };
+      upd();
+    } else { box.style.display = 'none'; }
+  });
+
+  function ordCollectMix() {
+    const parts = (document.getElementById('ord-mix-parts')?.textContent || '').trim();
+    return parts ? 'Комбинированная (' + parts + ')' : '';
+  }
+
+  function saveReservationOrder() {
+    const tm = (document.getElementById('res-time').value || '').trim();
+    const tid = document.getElementById('res-table').value;
+    const phone = document.getElementById('res-phone').value.trim();
+    const name = document.getElementById('res-name').value.trim();
+    const guests = Number(document.getElementById('ord-guests').value) || 0;
+    const closed = document.getElementById('ord-closed').checked ? 1 : 0;
+    const adv = Number(document.getElementById('ord-adv').value) || 0;
+    let method = ordAdvMethod || ordCollectMix();
+    if (adv > 0 && !method) return alert('Выберите метод оплаты аванса');
+    if (method && adv <= 0) return alert('Выбран метод оплаты, но сумма аванса = 0.\nЕсли деньги приняты — укажите сумму (кнопки «Вся сумма» / «50%»),\nесли нет — уберите метод оплаты.');
+    const total = ordTotal();
+    if (adv > total) return alert('Аванс больше суммы заказа');
+    const fd = new FormData();
+    fd.append('table_id', tid);
+    fd.append('res_date', resDate);
+    fd.append('res_time', tm);
+    fd.append('phone', phone);
+    fd.append('guest_name', name);
+    fd.append('oper_id', currentOper);
+    fd.append('guests_count', guests);
+    fd.append('is_closed_event', closed);
+    fd.append('items_json', JSON.stringify(ordCart.map(i => ({ name_id: i.name_id, qty: i.qty }))));
+    fd.append('advance_amount', adv);
+    fd.append('advance_method', method);
+    if (ordSavedId) fd.append('res_id', ordSavedId);
+    fetch('/api/reservations/order', { method: 'POST', body: fd })
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!ok) throw new Error(d.detail || 'Ошибка');
+        ordSavedId = d.id;
+        document.getElementById('ord-pdf').style.display = 'inline-block';
+        document.getElementById('ord-save').style.display = 'none';
+        let msg = '✅ Бронь №' + d.id + ' с предзаказом сохранена. Итого: ' + ordFmt(d.total) + ' ₽';
+        if ((d.closed_tables || []).length) msg += '\nЗакрытое мероприятие: занято столов: ' + (d.closed_tables.length + 1);
+        alert(msg);
+        closeReserveModal();
+        ordConflicts = d.conflicts || [];
+        if (ordConflicts.length) showNextCancelReq();
+      })
+      .catch(e => alert('❌ ' + e.message));
+  }
+
+  function orderPdf() {
+    if (!ordSavedId) return;
+    window.open('/api/reservations/order_pdf?res_id=' + ordSavedId, '_blank');
+  }
+
+  // ===== Диалог отмены брони (конфликт с закрытым банкетом / по инициативе) =====
+  let ordConflicts = [];
+  let cancelreqQueue = [];
+
+  function fmtResShort(x) {
+    const p = String(x.res_date).split('-');
+    return p[2] + '.' + p[1] + '.' + p[0].slice(2) + '_' + String(x.res_time).slice(0, 5) +
+      '_' + x.table_id + '_' + (x.phone || '') + '_' + (x.guest_name || '');
+  }
+
+  function showCancelReq(item) {
+    cancelreqQueue.push(item);
+    const ov = document.getElementById('cancelreq-overlay');
+    if (ov.style.display !== 'flex') showNextCancelReq();
+  }
+
+  function showNextCancelReq() {
+    const item = cancelreqQueue.shift();
+    if (!item) return;
+    document.getElementById('cancelreq-text').textContent =
+      'Отменить бронь ' + fmtResShort(item) + ' (ОБЯЗАТЕЛЬНО: СМС затем звонок)';
+    document.getElementById('cancelreq-notify').value = '';
+    document.getElementById('cancelreq-pin').value = '';
+    document.getElementById('cancelreq-time-row').style.display = 'none';
+    const radios = document.getElementsByName('cancelreq-init');
+    radios.forEach(r => r.checked = r.value === 'client');
+    document.getElementById('cancelreq-overlay').style.display = 'flex';
+  }
+
+  function cancelreqToggleTime() {
+    const v = document.querySelector('input[name="cancelreq-init"]:checked').value;
+    document.getElementById('cancelreq-time-row').style.display = v === 'cafe' ? 'block' : 'none';
+  }
+
+  function cancelreqConfirm() {
+    const item = cancelreqQueue[0];
+    if (!item) return;
+    const pin = document.getElementById('cancelreq-pin').value.trim();
+    const initiator = document.querySelector('input[name="cancelreq-init"]:checked').value;
+    const nt = document.getElementById('cancelreq-notify').value; // YYYY-MM-DDTHH:MM
+    const fd = new FormData();
+    fd.append('res_id', item.id);
+    fd.append('pin', pin);
+    fd.append('initiator', initiator);
+    if (nt) fd.append('notify_time', nt.replace('T', ' '));
+    fetch('/api/reservations/cancel', { method: 'POST', body: fd })
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!ok) throw new Error(d.detail || 'Ошибка');
+        cancelreqQueue.shift();
+        document.getElementById('cancelreq-overlay').style.display = 'none';
+        localStorage.setItem('w_cancel_' + currentOper + '_' + item.id, '1');
+        let msg = '✅ Бронь №' + item.id + ' отменена (' + d.cancelled_by + ')';
+        if (d.notify_time) msg += '. Напоминание про СМС/звонок: ' + d.notify_time;
+        alert(msg);
+        if (cancelreqQueue.length) showNextCancelReq();
+      })
+      .catch(e => alert('❌ ' + e.message));
+  }
+
+  function closeRemindModal() {
+    document.getElementById('remind-overlay').style.display = 'none';
+    if (remindQueue.length) showNextRemind();
+  }
+
+  function showRemind(title, html) {
+    remindQueue.push({ title, html });
+    const ov = document.getElementById('remind-overlay');
+    if (ov.style.display !== 'flex') showNextRemind();
+  }
+
+  function showNextRemind() {
+    const item = remindQueue.shift();
+    if (!item) return;
+    document.getElementById('remind-title').textContent = item.title;
+    document.getElementById('remind-body').innerHTML = item.html;
+    document.getElementById('remind-overlay').style.display = 'flex';
+    try { document.getElementById('beep')?.play(); } catch (e) {}
+  }
+
+  function fmtRes(r) {
+    return 'Стол ' + r.table_id + ' · ' + (r.res_time || '').slice(0, 5) +
+      ' · ' + (r.guest_name || '') + ' · ' + (r.phone || '');
+  }
+
+  function checkBartenderReminders(isLogin) {
+    fetch('/api/reservations/reminders')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d) return;
+        const day = d.day;
+        const morningKey = 'w_morning_' + currentOper + '_' + day;
+        if (isLogin && (d.today || []).length && !localStorage.getItem(morningKey)) {
+          localStorage.setItem(morningKey, '1');
+          const html = (d.today || []).map(r => '<div>' + fmtRes(r) + '</div>').join('') || 'Нет броней';
+          showRemind('Брони на сегодня', html);
+        }
+        (d.due_soon || []).forEach(r => {
+          const key = 'w_hour_' + currentOper + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showRemind('Через час бронь', '<div>' + fmtRes(r) + '</div>');
+        });
+        (d.day_before || []).forEach(r => {
+          const key = 'w_daybefore_' + currentOper + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showRemind('Завтра ' + (r.is_closed_event ? 'закрытое мероприятие' : 'бронь'), '<div>' + fmtRes(r) + '</div>');
+        });
+        if (isLogin && (d.morning || []).length) {
+          const mk = 'w_morning2_' + currentOper + '_' + day;
+          if (!localStorage.getItem(mk)) {
+            localStorage.setItem(mk, '1');
+            const html = (d.morning || []).map(r => '<div>' + fmtRes(r) + '</div>').join('');
+            showRemind('Сегодня брони и мероприятия', html);
+          }
+        }
+        (d.due_soon_2h || []).forEach(r => {
+          const key = 'w_2h_' + currentOper + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          const t = r.is_closed_event ? 'Через 2 часа мероприятие' : 'Через 2 часа бронь';
+          showRemind(t, '<div>' + fmtRes(r) + '</div>');
+        });
+        (d.cancel_requests || []).forEach(r => {
+          const key = 'w_cancelreq_' + currentOper + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          showCancelReq(r);
+        });
+        (d.sms_due || []).forEach(r => {
+          const key = 'w_sms_' + currentOper + '_' + r.id;
+          if (localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          showRemind('⚠️ СМС затем звонок клиенту (отмена брони)',
+            '<div>' + fmtRes(r) + '</div>');
+        });
+      })
+      .catch(() => {});
+  }
+
+  function loadOrders() {
+    loadTableButtons();
+    fetch(`/api/orders/active?oper_id=${currentOper}&view=waiter`)
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(data => {
+        const tb = document.querySelector('#waiter-tbl tbody');
+        tb.innerHTML = '';
+        const readyRows = (data || []).filter(row => {
+          if (row.status === 'ready') return true;
+          const nid = parseInt(row.name_id, 10);
+          return nid >= 401 && nid <= 450 && (parseInt(row.stage, 10) || 1) >= 3;
+        });
+        if (!readyRows.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="empty">Нет готовых блюд к выдаче ✅</td></tr>';
+          return;
+        }
+        readyRows.forEach(row => {
+          const tr = document.createElement('tr');
+          const pickupLabel = row.pickup_point === 'il_drive' ? '🍽 ОкноГриль' : '🍸 Бар';
+          tr.innerHTML = `
+            <td>${row.order_id}</td>
+            <td>Стол ${row.table_id}</td>
+            <td><b>${row.name}</b></td>
+            <td>${row.qty}</td>
+            <td>${pickupLabel}</td>
+            <td><button class="btn-serve" onclick="window.markServed(${row.id})">✅ Подано</button></td>
+          `;
+          tb.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.querySelector('#waiter-tbl tbody').innerHTML =
+          `<tr><td colspan="6" class="empty" style="color:red">Ошибка загрузки: ${err.message}</td></tr>`;
+      });
+  }
+
+  window.markServed = function(itemId) {
+    const fd = new FormData();
+    fd.append('item_id', String(itemId));
+    fd.append('new_status', 'served');
+    fd.append('oper_id', currentOper);
+    fetch('/api/orders/status', { method: 'POST', body: fd })
+      .then(r => {
+        if (r.ok) loadOrders();
+        else return r.json().then(e => alert('❌ ' + (e.detail || 'ошибка')));
+      })
+      .catch(e => alert('❌ Ошибка сети: ' + e.message));
+  };
+
+  window.settleTable = async function(tableInfo) {
+    const due = tableInfo.due_total || 0;
+    const tableId = tableInfo.table_id;
+    const orderIds = tableInfo.order_ids || [];
+    if (!orderIds.length) return alert('Нет заказов для расчёта');
+
+    let method = 'cash';
+    let tips = 0;
+    if (due > 0) {
+      try {
+        const payChoice = await showPayMethodModal(due, tableId);
+        method = payChoice.method;
+        tips = payChoice.tips || 0;
+      } catch {
+        return;
+      }
+      if (method === 'cash') {
+        try {
+          await showCashPayModal(due, tips, 'Стол ' + tableId + ' — наличные');
+        } catch {
+          return;
+        }
+      }
+    } else if (!confirm(`Стол ${tableId}: выдан полностью. Закрыть заказ?`)) {
+      return;
+    }
+
+    try {
+      for (const oid of orderIds) {
+        const summary = await fetch(`/api/orders/summary_by_id?order_id=${encodeURIComponent(oid)}`).then(r => r.json());
+        if (summary.due > 0) {
+          const fd = new FormData();
+          fd.append('order_id', oid);
+          fd.append('method', method);
+          fd.append('amount', String(summary.due));
+          fd.append('oper_id', currentOper);
+          const payRes = await fetch('/api/payments/add', { method: 'POST', body: fd });
+          const payData = await payRes.json();
+          if (!payRes.ok) throw new Error(payData.detail || 'Ошибка оплаты');
+        }
+        const fdSettle = new FormData();
+        fdSettle.append('order_id', oid);
+        const settleRes = await fetch('/api/orders/settle', { method: 'POST', body: fdSettle });
+        const settleData = await settleRes.json();
+        if (!settleRes.ok) throw new Error(settleData.detail || 'Ошибка закрытия');
+      }
+      if (tips > 0) {
+        const fdTip = new FormData();
+        fdTip.append('order_id', orderIds[0]);
+        fdTip.append('waiter_id', currentOper);
+        fdTip.append('amount', String(tips));
+        const tipRes = await fetch('/api/tips/add', { method: 'POST', body: fdTip });
+        const tipData = await tipRes.json();
+        if (!tipRes.ok) throw new Error(tipData.detail || 'Ошибка записи чаевых');
+      }
+      const tipMsg = tips > 0 ? `, чаевые ${tips.toFixed(0)} ₽` : '';
+      alert(`✅ Стол ${tableId}: расчёт проведён${tipMsg}`);
+      ackSignal(tableId, 'all');
+      loadOrders();
+    } catch (e) {
+      alert('❌ ' + e.message);
+    }
+  };
+</script>
+</body>
+</html>

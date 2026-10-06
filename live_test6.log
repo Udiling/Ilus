@@ -1,0 +1,42 @@
+INFO:     Started server process [21700]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8099 (Press CTRL+C to quit)
+[OK] База данных успешно инициализирована.
+[OK] migrate_v1: расширенные таблицы и индексы применены.
+[OK] migrate_v2: расширения БД применены.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v4: оценка обслуживания.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:54621 - "POST /api/reservations HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54622 - "POST /api/reservations/order HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54623 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54624 - "POST /api/reservations/cancel HTTP/1.1" 403 Forbidden
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54625 - "POST /api/reservations/cancel HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:54626 - "GET /api/reservations?day=2026-09-10 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54627 - "POST /api/reservations/cancel HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54628 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:54629 - "GET /api/reservations/free?res_date=2026-09-10&res_time=19:00 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:54671 - "POST /api/reservations HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:54672 - "POST /api/reservations/order HTTP/1.1" 200 OK

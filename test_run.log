@@ -1,0 +1,19 @@
+[1/5] Checking Python...
+[2/5] Checking dependencies...
+[3/5] Initializing database...
+[OK] База данных успешно инициализирована.
+[OK] migrate_v1: расширенные таблицы и индексы применены.
+[OK] migrate_v2: расширения БД применены.
+Database initialized OK.
+[4/5] Checking port 8080...
+[5/5] Starting server (uvicorn)...
+Server: http://localhost:8080
+Press Ctrl+C to stop.
+
+INFO:     Started server process [15112]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
+
+Server stopped with an error.
+„«п Їа®¤®«¦Ґ­Ёп ­ ¦¬ЁвҐ «оЎго Є« ўЁиг . . . 

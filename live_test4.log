@@ -1,0 +1,30 @@
+INFO:     Started server process [16920]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8099 (Press CTRL+C to quit)
+[OK] База данных успешно инициализирована.
+[OK] migrate_v1: расширенные таблицы и индексы применены.
+[OK] migrate_v2: расширения БД применены.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v4: оценка обслуживания.
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:64266 - "GET /api/menu HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:64276 - "POST /api/reservations/order HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:64277 - "GET /api/reservations/order?res_id=4 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:64278 - "GET /api/reservations/order_pdf?res_id=4 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:64279 - "GET /api/reservations/free?res_date=2026-09-09&res_time=18:00 HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:64280 - "GET /api/reservations/reminders HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+[OK] migrate_v5: предзаказы при бронировании.
+INFO:     127.0.0.1:64281 - "POST /api/reservations/order HTTP/1.1" 200 OK
+[OK] migrate_v3: столы и брони.
+INFO:     127.0.0.1:64282 - "GET /api/reservations/free?res_date=2026-09-09&res_time=18:00 HTTP/1.1" 200 OK

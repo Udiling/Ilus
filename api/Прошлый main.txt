@@ -1,0 +1,697 @@
+from pathlib import Path
+from fastapi import FastAPI, HTTPException, APIRouter, UploadFile, File, Form, Request, Query
+from fastapi.responses import HTMLResponse, JSONResponse
+import os, json, shutil
+from datetime import datetime
+from core.config import TEMPLATES_DIR
+from core.sync_service import sync_dictionary
+from db.manager import get_conn, db
+from utils.references import generate_ref
+
+app = FastAPI()
+router = APIRouter()
+# PIN-коды (замените на свои)
+ROOT_PIN = "9999"    # для 0, 52, 77
+STAFF_PIN = "2222"   # для 31–40 (бар/официанты)
+
+ALLOWED_CANCEL_IDS = set([str(i) for i in range(31, 41)]) | {'0','52','77'}
+
+@router.post("/orders/split_items")
+def split_items(
+    order_id: str = Form(...),
+    item_ids_json: str = Form(...),   # JSON: [1,5,9]
+    oper_id: str = Form(...),
+    pin: str = Form(...)
+):
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав на разделение")
+    if not _verify_pin(oper_id, pin):
+        raise HTTPException(403, detail="Неверный PIN")
+
+    try:
+        item_ids = json.loads(item_ids_json)
+        if not isinstance(item_ids, list) or not item_ids:
+            raise ValueError
+    except Exception:
+        raise HTTPException(400, detail="item_ids_json должен быть JSON-массивом ID")
+
+    rows = db.execute("SELECT * FROM active_orders WHERE id IN ({seq}) AND order_id=?".format(
+        seq=",".join(["?"]*len(item_ids))
+    ), (*item_ids, order_id)).fetchall()
+    if not rows:
+        raise HTTPException(404, detail="Позиции не найдены")
+
+    # создаём новый order_id
+    new_order_id = f"ORD-{datetime.now().strftime('%H%M%S')}"
+    try:
+        db.execute("BEGIN")
+        for r in rows:
+            it = dict(r)
+            if it["status"] == "served":
+                raise HTTPException(400, detail=f"Позиция {it['id']} уже выдана")
+            # переносим строку в новый заказ
+            db.execute("UPDATE active_orders SET order_id=? WHERE id=?", (new_order_id, it["id"]))
+        # событие
+        db.execute("""
+            INSERT INTO order_events(order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok)
+            VALUES(?, NULL, 'split', ?, ?, ?, 1)
+        """, (
+            order_id,
+            json.dumps({"moved": item_ids}, ensure_ascii=False),
+            json.dumps({"new_order_id": new_order_id}, ensure_ascii=False),
+            oper_id
+        ))
+        db.commit()
+        return JSONResponse({"status": "ok", "new_order_id": new_order_id, "moved": item_ids})
+    except HTTPException:
+        db.rollback(); raise
+    except Exception as e:
+        db.rollback(); raise HTTPException(500, detail=f"Ошибка split_items: {e}")
+
+@router.post("/orders/split_qty")
+def split_qty(
+    item_id: int = Form(...),
+    qty_to_move: int = Form(...),
+    oper_id: str = Form(...),
+    pin: str = Form(...)
+):
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав")
+    if not _verify_pin(oper_id, pin):
+        raise HTTPException(403, detail="Неверный PIN")
+    if qty_to_move <= 0:
+        raise HTTPException(400, detail="qty_to_move должен быть > 0")
+
+    row = db.execute("SELECT * FROM active_orders WHERE id=?", (item_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, detail="Позиция не найдена")
+    it = dict(row)
+    if it["status"] == "served":
+        raise HTTPException(400, detail="Позиция уже выдана")
+    if qty_to_move > int(it["qty"]):
+        raise HTTPException(400, detail="qty_to_move больше, чем в позиции")
+
+    new_order_id = f"ORD-{datetime.now().strftime('%H%M%S')}"
+    try:
+        db.execute("BEGIN")
+        # уменьшаем кол-во в исходной строке
+        db.execute("UPDATE active_orders SET qty = qty - ? WHERE id=?", (qty_to_move, item_id))
+        # создаём новую строку в новом заказе с таким же составом
+        db.execute("""
+            INSERT INTO active_orders(
+                order_id, oper_id, table_id, name_id, name, qty, price, status, stage,
+                production_line, pickup_point, discount_pct, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        """, (
+            new_order_id, it["oper_id"], it["table_id"], it["name_id"], it["name"],
+            qty_to_move, it["price"], it["status"], it.get("stage", 1),
+            it.get("production_line", 1), it.get("pickup_point", "bar"), it.get("discount_pct", 0.0)
+        ))
+        db.execute("""
+            INSERT INTO order_events(order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok)
+            VALUES(?, ?, 'split', ?, ?, ?, 1)
+        """, (
+            it["order_id"], item_id,
+            json.dumps({"moved_qty": qty_to_move}, ensure_ascii=False),
+            json.dumps({"new_order_id": new_order_id}, ensure_ascii=False),
+            oper_id
+        ))
+        db.commit()
+        return JSONResponse({"status": "ok", "new_order_id": new_order_id, "moved_qty": qty_to_move})
+    except Exception as e:
+        db.rollback(); raise HTTPException(500, detail=f"Ошибка split_qty: {e}")
+
+def _verify_pin(oper_id: str, pin: str) -> bool:
+    if not oper_id or not pin:
+        return False
+    op = oper_id.strip()
+    if op in {'0','52','77'}:
+        return pin == ROOT_PIN
+    if op in ALLOWED_CANCEL_IDS:
+        return pin == STAFF_PIN
+    return False
+
+def _ensure_not_served(item_row: dict):
+    if item_row.get('status') == 'served':
+        raise HTTPException(400, detail="Позиция уже выдана (served) — операция запрещена")
+
+# === КОНФИГУРАЦИЯ ДОСТУПА И ЛОГИСТИКИ ===
+SUPERUSERS = {'0', '52', '77'}
+
+STATION_RANGES = {
+    'bar_all': (101, 400),
+    'il_drive': (601, 700),
+    'hot': (451, 500),
+    'banquet': (501, 550),
+    'salads': (551, 600),
+    'chiry': (401, 450)
+}
+
+ACCESS_MATRIX = {
+    '0': 'ALL', '52': 'ALL', '77': 'ALL',
+    '31': 'bar', '32': 'bar', '33': 'bar', '34': 'bar', '35': 'bar',
+    '36': 'bar', '37': 'bar', '38': 'bar', '39': 'bar', '40': 'bar',
+    '41': 'il_drive', '42': 'il_drive', '43': 'il_drive', '44': 'il_drive',
+    '45': 'il_drive', '46': 'il_drive', '47': 'il_drive', '48': 'il_drive',
+    '49': 'il_drive', '50': 'il_drive',
+    '61': 'hot', '62': 'hot',
+    '63': 'salads', '64': 'salads',
+    '65': 'chiry', '66': 'chiry', '67': 'chiry',
+    '68': 'chiry', '69': 'chiry', '70': 'chiry',
+    '71': 'chiry', '72': 'chiry', '73': 'chiry',
+    '74': 'chiry', '75': 'chiry', '76': 'chiry',
+}
+
+def get_station_by_id(op_id):
+    op = op_id.strip()
+    if op in SUPERUSERS:
+        return 'ALL'
+    return ACCESS_MATRIX.get(op, 'none')
+
+def get_pickup_by_id(op_id):
+    op = op_id.strip()
+    if ('41' <= op <= '50') or ('61' <= op <= '62') or ('65' <= op <= '76'):
+        return 'il_drive'
+    return 'bar'
+
+@router.get("/menu")
+def get_full_menu():
+    rows = db.execute(
+        "SELECT name_id, name, unit, price, description, category FROM menu WHERE is_active = 1 ORDER BY CAST(name_id AS INTEGER)"
+    ).fetchall()
+    return JSONResponse([dict(r) for r in rows])
+	
+@router.get("/ui/{template_id}")
+def get_ui(template_id: str):
+    tpl_path = TEMPLATES_DIR / (template_id + ".")
+    fallback_path = TEMPLATES_DIR / "default."
+    path_to_use = tpl_path if tpl_path.exists() else fallback_path
+    if not path_to_use.exists():
+        raise HTTPException(status_code=404, detail="Шаблон не найден")
+    with open(path_to_use, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+@router.post("/orders/create")
+def create_order(oper_id: str = Form(...), table_id: str = Form(...), items_json: str = Form(...)):
+    items = json.loads(items_json)
+    if not items:
+        raise HTTPException(400, detail="Пустой заказ")
+    op = oper_id.strip()
+    pickup = get_pickup_by_id(op)
+    is_complex = any(401 <= int(i.get('name_id', 0)) <= 700 for i in items)
+    prod_line = 1
+    if is_complex:
+        c1 = db.execute("SELECT COUNT(*) FROM active_orders WHERE production_line=1 AND status!='served'").fetchone()[0]
+        c2 = db.execute("SELECT COUNT(*) FROM active_orders WHERE production_line=2 AND status!='served'").fetchone()[0]
+        prod_line = 2 if c2 < c1 else 1
+    order_id = f"ORD-{datetime.now().strftime('%H%M%S')}"
+    order_id = f"ORD-{datetime.now().strftime('%H%M%S')}"
+    sql = """INSERT INTO active_orders 
+             (order_id, oper_id, table_id, name_id, name, qty, price, production_line, pickup_point, status, created_at, stage)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', datetime('now'), 1)"""
+    data = [
+        (order_id, op, table_id, i.get('name_id'), i.get('name'), i.get('qty', 1), i.get('price'), prod_line, pickup)
+        for i in items
+    ]
+    db.executemany(sql, data)
+    db.commit()
+    return {"order_id": order_id, "pickup": pickup}
+
+@router.get("/orders/active")
+def get_active_orders(station: str = Query(None), oper_id: str = Query(None)):
+    op = oper_id.strip() if oper_id else ""
+    allowed = get_station_by_id(op)
+    is_waiter = ('31' <= op <= '40')
+    pickup = get_pickup_by_id(op)
+    
+    q = "SELECT * FROM active_orders WHERE status != 'served'"
+    params = []
+    
+    if is_waiter:
+        q += " AND status = 'ready' AND pickup_point = ?"
+        params.append(pickup)
+    elif allowed == 'ALL' or (allowed == station and allowed != 'none'):
+        if station and station in STATION_RANGES:
+            mn, mx = STATION_RANGES[station]
+            q += " AND CAST(name_id AS INTEGER) BETWEEN ? AND ?"
+            params.extend([mn, mx])
+    else:
+        return JSONResponse([])
+        
+    q += " ORDER BY created_at"
+    return JSONResponse([dict(r) for r in db.execute(q, params).fetchall()])
+
+@router.post("/orders/status")
+def update_order_status(item_id: int = Form(...), new_status: str = Form(...), oper_id: str = Form(default="system")):
+    row = db.execute("SELECT * FROM active_orders WHERE id=?", (item_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, detail="Позиция не найдена")
+        
+    item = dict(row)
+    name_id = int(item.get("name_id", "0"))
+    stage = int(item.get("stage", 1))
+    op = oper_id.strip()
+    allowed = get_station_by_id(op)
+    
+    if allowed == 'none':
+        raise HTTPException(403, detail="Нет доступа к этой операции")
+        
+    is_chiry = 401 <= name_id <= 450
+    is_il = 601 <= name_id <= 700
+    
+    if is_chiry or is_il:
+        if op in SUPERUSERS or allowed == 'ALL':
+            if new_status == 'served':
+                stage = 3
+        else:
+            if is_chiry:
+                if op in ['65','66','67'] and stage == 1 and new_status == 'working':
+                    stage, new_status = 2, 'working'
+                elif op in ['68','69','70'] and stage == 2 and new_status == 'ready':
+                    stage, new_status = 3, 'ready'
+                else:
+                    raise HTTPException(403, detail="⛔ Неверный этап или оператор Чиров")
+            elif is_il:
+                if stage == 1 and new_status == 'working':
+                    stage = 2
+                elif stage == 2 and new_status == 'ready':
+                    stage = 3
+    else:
+        if new_status == 'served':
+            stage = 1
+
+    db.execute("UPDATE active_orders SET status=?, stage=? WHERE id=?", (new_status, stage, item_id))
+    db.commit()
+    return {"status": new_status, "stage": stage, "item_id": item_id}
+
+@router.post("/orders/cancel_item")
+def cancel_item(item_id: int = Form(...), oper_id: str = Form(...), pin: str = Form(...), reason: str = Form(None)):
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав на отмену позиции")
+    if not _verify_pin(oper_id, pin):
+        raise HTTPException(403, detail="Неверный PIN")
+
+    row = db.execute("SELECT * FROM active_orders WHERE id = ?", (item_id,)).fetchone()
+    if not row:
+        raise HTTPException(404, detail="Позиция не найдена")
+    item = dict(row)
+    _ensure_not_served(item)
+
+    try:
+        db.execute("BEGIN")
+        db.execute("UPDATE active_orders SET status = 'cancelled' WHERE id = ?", (item_id,))
+        db.execute("""
+            INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok)
+            VALUES (?, ?, 'cancel', ?, ?, ?, 1)
+        """, (
+            item['order_id'], item_id,
+            json.dumps({"status": item["status"]}, ensure_ascii=False),
+            json.dumps({"status": "cancelled", "reason": reason or ""}, ensure_ascii=False),
+            oper_id
+        ))
+        db.commit()
+        return JSONResponse({"status": "cancelled", "item_id": item_id})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка отмены позиции: {e}")
+		
+@router.post("/orders/cancel_order")
+def cancel_order(order_id: str = Form(...), oper_id: str = Form(...), pin: str = Form(...), reason: str = Form(None)):
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав на отмену заказа")
+    if not _verify_pin(oper_id, pin):
+        raise HTTPException(403, detail="Неверный PIN")
+
+    rows = db.execute("SELECT id, status FROM active_orders WHERE order_id = ?", (order_id,)).fetchall()
+    if not rows:
+        raise HTTPException(404, detail="Заказ не найден")
+
+    # запретим отмену, если есть уже выданные позиции
+    if any(r["status"] == "served" for r in rows):
+        raise HTTPException(400, detail="Часть позиций уже выдана — отмена заказа запрещена")
+
+    try:
+        db.execute("BEGIN")
+        db.execute("UPDATE active_orders SET status = 'cancelled' WHERE order_id = ?", (order_id,))
+        db.execute("""
+            INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok)
+            VALUES (?, NULL, 'cancel', ?, ?, ?, 1)
+        """, (
+            order_id,
+            json.dumps({"items": len(rows)}, ensure_ascii=False),
+            json.dumps({"status": "cancelled", "reason": reason or ""}, ensure_ascii=False),
+            oper_id
+        ))
+        db.commit()
+        return JSONResponse({"status": "cancelled", "order_id": order_id, "items": len(rows)})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка отмены заказа: {e}")
+		
+@router.post("/orders/edit_item")
+def edit_item(item_id: int = Form(...), new_qty: int = Form(...), oper_id: str = Form(...), pin: str = Form(...)):
+    if new_qty <= 0:
+        raise HTTPException(400, detail="Количество должно быть > 0")
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав на редактирование")
+   
+def _get_order_totals(order_id: str) -> dict:
+    # Сумма по позициям (без отменённых)
+    rows = db.execute(
+        "SELECT qty, price, status FROM active_orders WHERE order_id = ?",
+        (order_id,)
+    ).fetchall()
+    subtotal = 0.0
+    for r in rows:
+        q = float(r["qty"] or 0)
+        p = float(r["price"] or 0.0)
+        if r["status"] != "cancelled":
+            subtotal += q * p
+
+    # Скидка (берём последнюю по времени)
+    disc_row = db.execute(
+        "SELECT percent FROM discounts WHERE order_id = ? ORDER BY ts DESC LIMIT 1",
+        (order_id,)
+    ).fetchone()
+    discount_pct = float(disc_row["percent"]) if disc_row else 0.0
+    total_after_discount = max(subtotal * (1.0 - discount_pct / 100.0), 0.0)
+
+    # Оплачено
+    paid = db.execute(
+        "SELECT COALESCE(SUM(amount),0) AS paid_sum FROM payments WHERE order_id = ?",
+        (order_id,)
+    ).fetchone()[0]
+    paid = float(paid or 0.0)
+
+    # Чаевые (для справки, не входят в выручку)
+    tip_total = db.execute(
+        "SELECT COALESCE(SUM(amount),0) FROM tips WHERE order_id = ?",
+        (order_id,)
+    ).fetchone()[0]
+    tip_total = float(tip_total or 0.0)
+
+    due = max(total_after_discount - paid, 0.0)
+
+    return {
+        "subtotal": round(subtotal, 2),
+        "discount_pct": discount_pct,
+        "total": round(total_after_discount, 2),
+        "paid": round(paid, 2),
+        "due": round(due, 2),
+        "tips": round(tip_total, 2),
+    }
+	
+@router.get("/orders/summary")
+def order_summary(order_id: str = Query(...)):
+    # Проверяем, что заказ существует
+    any_row = db.execute("SELECT 1 FROM active_orders WHERE order_id = ? LIMIT 1", (order_id,)).fetchone()
+    if not any_row:
+        raise HTTPException(404, detail="Заказ не найден")
+    return JSONResponse(_get_order_totals(order_id))
+	
+@router.post("/payments/add")
+def add_payment(
+    order_id: str = Form(...),
+    method: str = Form(...),   # cash | card | transfer
+    amount: float = Form(...),
+    oper_id: str = Form(None)
+):
+    method = (method or "").strip().lower()
+    if method not in {"cash", "card", "transfer"}:
+        raise HTTPException(400, detail="Метод оплаты должен быть: cash|card|transfer")
+    try:
+        amt = float(amount)
+    except Exception:
+        raise HTTPException(400, detail="Сумма должна быть числом")
+    if amt <= 0:
+        raise HTTPException(400, detail="Сумма должна быть > 0")
+
+    # Проверка, что заказ существует
+    any_row = db.execute("SELECT 1 FROM active_orders WHERE order_id = ? LIMIT 1", (order_id,)).fetchone()
+    if not any_row:
+        raise HTTPException(404, detail="Заказ не найден")
+
+    totals = _get_order_totals(order_id)
+    # Не даём переплатить (можно снять ограничение при необходимости)
+    if amt > totals["due"] + 1e-6:
+        raise HTTPException(400, detail=f"Сумма {amt} превышает остаток к оплате ({totals['due']})")
+
+    try:
+        db.execute(
+            "INSERT INTO payments (order_id, method, amount, oper_id) VALUES (?, ?, ?, ?)",
+            (order_id, method, amt, oper_id or "system")
+        )
+        db.execute(
+            "INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok) VALUES (?, NULL, 'payment', ?, ?, ?, 1)",
+            (
+                order_id,
+                json.dumps({"due_before": totals["due"]}, ensure_ascii=False),
+                json.dumps({"paid": amt, "method": method}, ensure_ascii=False),
+                oper_id or "system"
+            )
+        )
+        db.commit()
+        return JSONResponse({"status": "ok", "order_id": order_id, "method": method, "amount": round(amt, 2), "summary": _get_order_totals(order_id)})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка записи оплаты: {e}")
+		
+@router.post("/tips/add")
+def add_tip(
+    order_id: str = Form(...),
+    waiter_id: str = Form(...),
+    amount: float = Form(...)
+):
+    # Проверяем существование заказа
+    any_row = db.execute("SELECT 1 FROM active_orders WHERE order_id = ? LIMIT 1", (order_id,)).fetchone()
+    if not any_row:
+        raise HTTPException(404, detail="Заказ не найден")
+
+    try:
+        val = float(amount)
+    except Exception:
+        raise HTTPException(400, detail="Сумма чаевых должна быть числом")
+    if val <= 0:
+        raise HTTPException(400, detail="Сумма чаевых должна быть > 0")
+
+    try:
+        db.execute(
+            "INSERT INTO tips (order_id, waiter_id, amount) VALUES (?, ?, ?)",
+            (order_id, waiter_id, val)
+        )
+        db.execute(
+            "INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok) VALUES (?, NULL, 'tip_add', NULL, ?, ?, 1)",
+            (order_id, json.dumps({"tips": val, "waiter_id": waiter_id}, ensure_ascii=False), waiter_id)
+        )
+        db.commit()
+        return JSONResponse({"status": "ok", "order_id": order_id, "waiter_id": waiter_id, "amount": round(val, 2), "summary": _get_order_totals(order_id)})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка записи чаевых: {e}")
+		
+@router.post("/discounts/set")
+def set_discount(
+    order_id: str = Form(...),
+    percent: float = Form(...),
+    oper_id: str = Form(...),
+    pin: str = Form(...)
+):
+    # Права и PIN
+    if oper_id not in ALLOWED_CANCEL_IDS and oper_id not in {'0','52','77'}:
+        raise HTTPException(403, detail="Нет прав на установку скидки")
+    if not _verify_pin(oper_id, pin):
+        raise HTTPException(403, detail="Неверный PIN")
+
+    # Заказ существует?
+    any_row = db.execute("SELECT 1 FROM active_orders WHERE order_id = ? LIMIT 1", (order_id,)).fetchone()
+    if not any_row:
+        raise HTTPException(404, detail="Заказ не найден")
+
+    try:
+        p = float(percent)
+    except Exception:
+        raise HTTPException(400, detail="Процент скидки должен быть числом")
+    if p < 0 or p > 100:
+        raise HTTPException(400, detail="Процент скидки должен быть в диапазоне 0..100")
+
+    try:
+        db.execute(
+            "INSERT INTO discounts (order_id, percent, set_by_oper_id) VALUES (?, ?, ?)",
+            (order_id, p, oper_id)
+        )
+        db.execute(
+            "INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok) VALUES (?, NULL, 'discount', NULL, ?, ?, 1)",
+            (order_id, json.dumps({"discount_pct": p}, ensure_ascii=False), oper_id)
+        )
+        db.commit()
+        return JSONResponse({"status": "ok", "order_id": order_id, "discount_pct": p, "summary": _get_order_totals(order_id)})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка установки скидки: {e}")
+		
+@router.post("/orders/settle")
+def settle_order(order_id: str = Form(...)):
+    # Есть ли позиции
+    any_row = db.execute("SELECT 1 FROM active_orders WHERE order_id = ? LIMIT 1", (order_id,)).fetchone()
+    if not any_row:
+        raise HTTPException(404, detail="Заказ не найден")
+
+    totals = _get_order_totals(order_id)
+    if totals["due"] > 1e-6:
+        raise HTTPException(400, detail=f"Не полностью оплачено. Остаток к оплате: {totals['due']}")
+
+    # Разбивка оплат по методам
+    pay_rows = db.execute(
+        "SELECT method, SUM(amount) AS sum FROM payments WHERE order_id = ? GROUP BY method",
+        (order_id,)
+    ).fetchall()
+    payments = {str(r["method"]): float(r["sum"] or 0.0) for r in pay_rows}
+
+    try:
+        db.execute("BEGIN")
+        # Финализация: закрываем все позиции заказа (кроме отменённых оставляем 'cancelled')
+        db.execute("""
+            UPDATE active_orders
+            SET status = CASE WHEN status = 'cancelled' THEN status ELSE 'closed' END
+            WHERE order_id = ?
+        """, (order_id,))
+
+        # Событие settle со снимком итогов и разбивкой оплат
+        db.execute("""
+            INSERT INTO order_events (order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok)
+            VALUES (?, NULL, 'settle', ?, ?, ?, 1)
+        """, (
+            order_id,
+            json.dumps({"due_before": totals["due"]}, ensure_ascii=False),
+            json.dumps({"total": totals["total"], "paid": totals["paid"], "by_method": payments}, ensure_ascii=False),
+            "system"
+        ))
+
+        db.commit()
+        # Возвращаем обновлённую сводку (избыточно, но удобно фронтенду)
+        return JSONResponse({
+            "status": "settled",
+            "order_id": order_id,
+            "payments": payments,
+            "summary": _get_order_totals(order_id)
+        })
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, detail=f"Ошибка закрытия заказа: {e}")
+		
+@router.get("/orders/events")
+def list_events(order_id: str = Query(None), limit: int = Query(200)):
+    q = "SELECT * FROM order_events"
+    params = []
+    if order_id:
+        q += " WHERE order_id = ?"
+        params.append(order_id)
+    q += " ORDER BY ts DESC LIMIT ?"
+    params.append(limit)
+    rows = db.execute(q, params).fetchall()
+    return JSONResponse([dict(r) for r in rows])
+
+@router.post("/export/day")
+def export_day():
+    day = datetime.now().strftime("%Y-%m-%d")
+    base = Path(__file__).parent.parent / "export"
+    base.mkdir(parents=True, exist_ok=True)
+    path = base / f"export-{day}.txt"
+	
+    try:
+        # Выборки за день
+        items = db.execute("""
+            SELECT order_id, table_id, name_id, name, qty, price, status, created_at
+            FROM active_orders
+            WHERE substr(created_at,1,10) = ?
+            ORDER BY order_id, id
+        """, (day,)).fetchall()
+
+        pays = db.execute("""
+            SELECT order_id, method, amount, oper_id, ts
+            FROM payments
+            WHERE substr(ts,1,10) = ?
+            ORDER BY ts
+        """, (day,)).fetchall()
+
+        tips = db.execute("""
+            SELECT order_id, waiter_id, amount, ts
+            FROM tips
+            WHERE substr(ts,1,10) = ?
+            ORDER BY ts
+        """, (day,)).fetchall()
+
+        discs = db.execute("""
+            SELECT order_id, percent, set_by_oper_id, ts
+            FROM discounts
+            WHERE substr(ts,1,10) = ?
+            ORDER BY ts
+        """, (day,)).fetchall()
+
+        evts = db.execute("""
+            SELECT order_id, item_id, event_type, old_val, new_val, oper_id, pin_ok, ts
+            FROM order_events
+            WHERE substr(ts,1,10) = ?
+            ORDER BY ts
+        """, (day,)).fetchall()
+
+        # Итоги дня
+        gross = 0.0
+        cancelled_cnt = 0
+        for r in items:
+            amt = float(r["qty"] or 0) * float(r["price"] or 0.0)
+            if r["status"] != "cancelled":
+                gross += amt
+            else:
+                cancelled_cnt += 1
+
+        paid = float(db.execute("""
+            SELECT COALESCE(SUM(amount),0) FROM payments WHERE substr(ts,1,10) = ?
+        """, (day,)).fetchone()[0] or 0.0)
+
+        tip_sum = float(db.execute("""
+            SELECT COALESCE(SUM(amount),0) FROM tips WHERE substr(ts,1,10) = ?
+        """, (day,)).fetchone()[0] or 0.0)
+
+        # Запись в файл
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(f"# Export day: {day}\n\n")
+
+            f.write("## SUMMARY\n")
+            f.write(f"Gross (items excl. cancelled): {gross:.2f}\n")
+            f.write(f"Cancelled items: {cancelled_cnt}\n")
+            f.write(f"Paid total: {paid:.2f}\n")
+            f.write(f"Tips total: {tip_sum:.2f}\n\n")
+
+            f.write("## ITEMS\n")
+            for r in items:
+                line = f"{r['order_id']}\t{r['table_id']}\t{r['name_id']}\t{r['name']}\t{r['qty']}\t{r['price']}\t{r['status']}\t{r['created_at']}\n"
+                f.write(line)
+            f.write("\n")
+
+            f.write("## PAYMENTS\n")
+            for r in pays:
+                line = f"{r['order_id']}\t{r['method']}\t{r['amount']}\t{r['oper_id']}\t{r['ts']}\n"
+                f.write(line)
+            f.write("\n")
+
+            f.write("## TIPS\n")
+            for r in tips:
+                line = f"{r['order_id']}\t{r['waiter_id']}\t{r['amount']}\t{r['ts']}\n"
+                f.write(line)
+            f.write("\n")
+
+            f.write("## DISCOUNTS\n")
+            for r in discs:
+                line = f"{r['order_id']}\t{r['percent']}\t{r['set_by_oper_id']}\t{r['ts']}\n"
+                f.write(line)
+            f.write("\n")
+
+            f.write("## EVENTS\n")
+            for r in evts:
+                line = f"{r['order_id']}\t{r['item_id']}\t{r['event_type']}\t{(r['old_val'] or '').replace(chr(9),' ')}\t{(r['new_val'] or '').replace(chr(9),' ')}\t{r['oper_id']}\t{r['pin_ok']}\t{r['ts']}\n"
+                f.write(line)
+
+        return JSONResponse({"status": "ok", "file": str(path)})
+    except Exception as e:
+        return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)

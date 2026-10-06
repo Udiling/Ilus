@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Оформление заказа</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #f4f6f8; padding-bottom: 120px; }
+    .header { background: #fff; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+    .header h2 { margin: 0 0 10px; font-size: 18px; }
+    .fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .field { display: flex; align-items: center; gap: 6px; }
+    .field label { font-size: 14px; color: #495057; white-space: nowrap; }
+    .field input { padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 80px; text-align: center; font-weight: 600; }
+    .tabs { display: flex; overflow-x: auto; background: #fff; padding: 10px; gap: 8px; border-bottom: 1px solid #eee; }
+    .tab-btn { padding: 8px 14px; border: 1px solid #0a58ca; background: #fff; color: #0a58ca; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 14px; }
+    .tab-btn.active { background: #0a58ca; color: #fff; }
+    .sub-tabs { display: flex; overflow-x: auto; background: #f8f9fa; padding: 8px 15px; gap: 6px; margin-bottom: 10px; }
+    .sub-btn { padding: 6px 10px; border: 1px solid #adb5bd; background: #fff; color: #495057; border-radius: 16px; cursor: pointer; white-space: nowrap; font-size: 13px; }
+    .sub-btn.active { background: #6c757d; color: #fff; border-color: #495057; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 15px; }
+    .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
+    .card:active { transform: scale(0.98); }
+    .card-img { height: 110px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6c757d; overflow: hidden; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .card-info { padding: 10px; text-align: center; }
+    .card-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .card-price { color: #0a58ca; font-weight: bold; }
+    .cart-panel { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 2px solid #0a58ca; padding: 12px 15px; z-index: 90; }
+    .cart-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .checkout-btn { width: 100%; background: #0a58ca; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .checkout-btn:disabled { background: #adb5bd; cursor: not-allowed; }
+    .cart-items { max-height: 140px; overflow-y: auto; margin-bottom: 8px; font-size: 13px; color: #495057; }
+    .cart-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-name { flex: 1; min-width: 0; font-weight: 500; }
+    .cart-qty-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .qty-btn { width: 28px; height: 28px; border: 1px solid #0a58ca; background: #fff; color: #0a58ca; border-radius: 6px; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .qty-btn:active { background: #e7f1ff; }
+    .qty-value { min-width: 24px; text-align: center; font-weight: bold; font-size: 14px; }
+    .cart-item-sum { min-width: 56px; text-align: right; font-weight: 600; color: #0a58ca; flex-shrink: 0; }
+    .toast { position: fixed; top: 20px; right: 20px; background: #198754; color: #fff; padding: 10px 15px; border-radius: 6px; z-index: 1000; display: none; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Оформление заказа</h2>
+    <div class="fields">
+      <div class="field">
+        <label for="oper-input">Oper ID:</label>
+        <input id="oper-input" placeholder="31">
+      </div>
+      <div class="field">
+        <label for="tbl-input">Стол:</label>
+        <input id="tbl-input" placeholder="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs" id="main-tabs"></div>
+  <div class="sub-tabs" id="sub-tabs"></div>
+  <div class="grid" id="menu-grid"></div>
+
+  <div class="cart-panel">
+    <div class="cart-items" id="cart-list"></div>
+    <div class="cart-row">
+      <span>Позиций: <b id="cart-count">0</b></span>
+      <span>Итого: <b id="cart-total">0</b> ₽</span>
+    </div>
+    <button class="checkout-btn" id="checkout-btn" disabled onclick="sendOrder()">Провести заказ</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  window.orderOperId = params.get('oper_id') || '';
+  const operInput = document.getElementById('oper-input');
+  const tblInput = document.getElementById('tbl-input');
+  if (operInput) operInput.value = window.orderOperId;
+  if (tblInput) tblInput.value = params.get('table_id') || '';
+
+  function getOperId() {
+    const v = (operInput && operInput.value.trim()) || window.orderOperId || '31';
+    window.orderOperId = v;
+    return v;
+  }
+
+  const ARIYAN_ID = 330;
+  const tabsConfig = {
+    'Бар': [
+      { name: 'Крепкий алкоголь', min: 101, max: 190 },
+      { name: 'Вино, шампанское', min: 191, max: 250 },
+      { name: 'Пиво, слабоалкогольные напитки', min: 251, max: 300 },
+      { name: 'Снеки', min: 301, max: 310 },
+      { name: 'Газированные напитки', min: 311, max: 329 },
+      { name: 'Сок, вода', min: 331, max: 380 },
+      { name: 'Чай, кофе', min: 381, max: 400 }
+    ],
+    'Чир-чиры': [
+      { name: 'С мясом', min: 401, max: 410, prependIds: [ARIYAN_ID] },
+      { name: 'Сыр, грибы', min: 411, max: 420, prependIds: [ARIYAN_ID] },
+      { name: 'С морепродуктами', min: 421, max: 430, prependIds: [ARIYAN_ID] },
+      { name: 'Сладкие', min: 431, max: 440, prependIds: [ARIYAN_ID] }
+    ],
+    'На завтрак, обед и ужин': [
+      { name: 'На первое', min: 461, max: 465 },
+      { name: 'Блины, вареники, пельмени', ids: [466, 467, 488, 489, 490, 491] },
+      { name: 'Горячие закуски', min: 485, max: 487 },
+      { name: 'Мясные блюда', min: 468, max: 475 },
+      { name: 'Из курицы', min: 454, max: 460 },
+      { name: 'Рыбка', min: 451, max: 453 },
+      { name: 'Гарнир', min: 476, max: 484 }
+    ],
+    'Салаты': [
+      { name: 'Холодные закуски', min: 555, max: 562 },
+      { name: 'Овощные', min: 561, max: 565 },
+      { name: 'Мясные', min: 566, max: 575 },
+      { name: 'С морепродуктами', min: 551, max: 554 }
+    ],
+    'Мангал': [
+      { name: 'Гриль', min: 601, max: 620 },
+      { name: 'Street Food', min: 621, max: 640 },
+      { name: 'Сладенькое', min: 641, max: 660 },
+      { name: 'Чай, кофе', min: 661, max: 680 },
+      { name: 'Коктейли, лимонад', min: 681, max: 700 }
+    ]
+  };
+
+  let allItems = [];
+  let cart = [];
+  let currentTab = '';
+  let currentSubTab = null;
+
+  function loadMenu() {
+    fetch('/api/menu?oper_id=' + encodeURIComponent(getOperId()))
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(data => {
+        if (!Array.isArray(data)) throw new Error('Неверный ответ сервера');
+        allItems = data;
+        filterAndRender();
+      })
+      .catch(e => {
+        const msg = location.protocol === 'file:'
+          ? 'Откройте http://localhost:8080/api/ui/form_order.html (не файл с диска).'
+          : 'Меню не загружено: ' + e.message;
+        const grid = document.getElementById('menu-grid');
+        if (grid) grid.innerHTML = '<p style="padding:20px;color:#dc3545;text-align:center">' + msg + '</p>';
+        showToast(msg);
+      });
+  }
+
+  window.renderMainTabs = function() {
+    const container = document.getElementById('main-tabs');
+    container.innerHTML = '';
+    Object.keys(tabsConfig).forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn';
+      btn.innerText = name;
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = name;
+        renderSubTabs();
+        filterAndRender();
+      };
+      container.appendChild(btn);
+    });
+    if (container.firstChild) container.firstChild.click();
+  };
+
+  window.renderSubTabs = function() {
+    const container = document.getElementById('sub-tabs');
+    container.innerHTML = '';
+    if (!tabsConfig[currentTab]) return;
+    const allBtn = document.createElement('button');
+    allBtn.className = 'sub-btn active';
+    allBtn.innerText = 'Все';
+    allBtn.onclick = () => {
+      document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      currentSubTab = null;
+      filterAndRender();
+    };
+    container.appendChild(allBtn);
+    tabsConfig[currentTab].forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'sub-btn';
+      btn.innerText = cat.name;
+      btn.onclick = () => {
+        document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSubTab = cat;
+        filterAndRender();
+      };
+      container.appendChild(btn);
+    });
+  };
+
+  window.filterAndRender = function() {
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = '';
+    const match = (item, tab) => {
+      const id = Number(item.name_id);
+      if (tab.ids) return tab.ids.includes(id);
+      return id >= tab.min && id <= tab.max;
+    };
+    let filtered = [];
+    const prependIds = [];
+    if (!currentSubTab) {
+      const subTabs = tabsConfig[currentTab] || [];
+      filtered = allItems.filter(i => subTabs.some(t => match(i, t)));
+      if (currentTab === 'Чир-чиры') prependIds.push(ARIYAN_ID);
+    } else {
+      filtered = allItems.filter(i => match(i, currentSubTab));
+      if (currentSubTab.prependIds) prependIds.push(...currentSubTab.prependIds);
+    }
+    if (prependIds.length) {
+      const prependItems = prependIds
+        .map(id => allItems.find(i => Number(i.name_id) === id))
+        .filter(Boolean);
+      const prependSet = new Set(prependIds);
+      filtered = [...prependItems, ...filtered.filter(i => !prependSet.has(Number(i.name_id)))];
+    }
+    filtered.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = '<div class="card-img"><img src="/static/menu_photos/' + item.name_id + '.jpg" onerror="this.src=\'/static/placeholder.jpg\'"></div><div class="card-info"><div class="card-name">' + item.name + '</div><div class="card-price">' + item.price + ' ₽</div></div>';
+      card.onclick = () => addToCart(item);
+      grid.appendChild(card);
+    });
+  };
+
+  window.addToCart = function(item) {
+    const exist = cart.find(i => i.name_id == item.name_id);
+    if (exist) exist.qty += 1;
+    else cart.push({ ...item, qty: 1 });
+    renderCart();
+  };
+
+  window.changeQty = function(nameId, delta) {
+    const idx = cart.findIndex(i => i.name_id == nameId);
+    if (idx === -1) return;
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    renderCart();
+  };
+
+  window.renderCart = function() {
+    const list = document.getElementById('cart-list');
+    const totalEl = document.getElementById('cart-total');
+    const countEl = document.getElementById('cart-count');
+    list.innerHTML = '';
+    let total = 0;
+    cart.forEach(i => {
+      total += i.price * i.qty;
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'cart-item-name';
+      nameSpan.textContent = i.name;
+      const controls = document.createElement('div');
+      controls.className = 'cart-qty-controls';
+      const minusBtn = document.createElement('button');
+      minusBtn.type = 'button';
+      minusBtn.className = 'qty-btn';
+      minusBtn.textContent = '−';
+      minusBtn.title = 'Убрать одно';
+      minusBtn.onclick = () => changeQty(i.name_id, -1);
+      const qtySpan = document.createElement('span');
+      qtySpan.className = 'qty-value';
+      qtySpan.textContent = i.qty;
+      const plusBtn = document.createElement('button');
+      plusBtn.type = 'button';
+      plusBtn.className = 'qty-btn';
+      plusBtn.textContent = '+';
+      plusBtn.title = 'Добавить ещё';
+      plusBtn.onclick = () => changeQty(i.name_id, 1);
+      controls.appendChild(minusBtn);
+      controls.appendChild(qtySpan);
+      controls.appendChild(plusBtn);
+      const sumSpan = document.createElement('span');
+      sumSpan.className = 'cart-item-sum';
+      sumSpan.textContent = (i.price * i.qty).toFixed(0) + ' ₽';
+      div.appendChild(nameSpan);
+      div.appendChild(controls);
+      div.appendChild(sumSpan);
+      list.appendChild(div);
+    });
+    totalEl.textContent = total.toFixed(0);
+    countEl.textContent = cart.reduce((s, i) => s + i.qty, 0);
+    const btn = document.getElementById('checkout-btn');
+    if (btn) btn.disabled = cart.length === 0;
+  };
+
+  window.sendOrder = function() {
+    const tbl = tblInput && tblInput.value.trim();
+    const op = getOperId();
+    if (!tbl) return alert('Укажите номер стола');
+    if (!op) return alert('Укажите Oper ID');
+    const fd = new FormData();
+    fd.append('oper_id', op);
+    fd.append('table_id', tbl);
+    fd.append('items_json', JSON.stringify(cart.map(i => ({
+      name_id: i.name_id, name: i.name, qty: i.qty, price: i.price
+    }))));
+    fetch('/api/orders/create', { method: 'POST', body: fd })
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!ok) throw new Error(d.detail || 'Ошибка создания заказа');
+        const pts = (d.pickups || [d.pickup]).map(p => p === 'il_drive' ? 'ОкноГриль' : 'Бар').join(', ');
+        showToast('Заказ ' + d.order_id + ' создан! Выдача: ' + pts);
+        cart = [];
+        renderCart();
+      })
+      .catch(e => alert('Ошибка: ' + e.message));
+  };
+
+  window.showToast = function(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return alert(msg);
+    t.innerText = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  };
+
+  if (operInput) operInput.addEventListener('change', loadMenu);
+
+  renderMainTabs();
+  loadMenu();
+</script>
+</body>
+</html>

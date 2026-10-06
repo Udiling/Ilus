@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Управление меню</title>
+  <style>
+    body{font-family:system-ui;padding:20px;background:#f4f6f8;}
+    .box{background:#fff;padding:20px;border-radius:8px;max-width:600px;margin:0 auto;}
+    input,select{width:100%;padding:10px;margin:6px 0;border:1px solid #ccc;border-radius:4px;}
+    button{padding:10px 16px;background:#0a58ca;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+    button:hover{background:#084298;}
+    .msg{margin-top:10px;padding:8px;background:#e9ecef;border-radius:4px;display:none;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Добавить/Обновить позицию меню</h2>
+    <input id="name_id" placeholder="ID (например 100)">
+    <input id="name" placeholder="Название">
+    <input id="unit" placeholder="Ед.изм (шт, л, г)">
+    <input id="price" type="number" placeholder="Цена">
+    <input id="description" placeholder="Описание">
+    <input id="category" placeholder="Категория">
+    <button onclick="saveMenu()">Сохранить в справочник</button>
+    <div id="res" class="msg"></div>
+  </div>
+  <script>
+    async function saveMenu(){
+      const d=[document.getElementById('name_id').value,document.getElementById('name').value,document.getElementById('unit').value,document.getElementById('price').value,document.getElementById('description').value,document.getElementById('category').value].join('*');
+      const blob=new Blob([d],{type:'text/plain;charset=utf-8'});
+      const fd=new FormData();fd.append('file',blob,`menu-${new Date().toISOString().slice(0,10)}.txt`);
+      document.getElementById('res').style.display='block';
+      document.getElementById('res').textContent='Загрузка...';
+      try{
+        const r=await fetch('/api/upload/menu',{method:'POST',body:fd});
+        document.getElementById('res').textContent=(await r.json()).status==='queued_for_sync'?'Успешно отправлено. Выполните синхронизацию.' : 'Ошибка ответа сервера';
+      }catch(e){document.getElementById('res').textContent='Ошибка соединения';}
+    }
+  </script>
+</body>
+</html>

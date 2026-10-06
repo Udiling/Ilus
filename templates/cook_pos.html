@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кухня и Цех</title>
+  <style>
+    :root { --bg: #f8f9fa; --panel: #fff; --accent: #0d6efd; --warn: #ffc107; --ok: #198754; --err: #dc3545; }
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 15px; background: var(--bg); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .modal-box { background: var(--panel); padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal-box input { font-size: 18px; padding: 10px; width: 250px; text-align: center; margin: 15px 0; border: 2px solid #ddd; border-radius: 8px; }
+    .modal-box button { background: var(--accent); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    .controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+    select, input { padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background: #e9ecef; cursor: not-allowed; }
+    select.unlocked, input.unlocked { background: #fff; cursor: text; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #e9ecef; font-weight: 600; }
+    tr.s1 { border-left: 4px solid var(--accent); } tr.s2 { border-left: 4px solid var(--warn); background: #fff8e1; } tr.s3 { border-left: 4px solid var(--ok); background: #e8f5e9; }
+    .btn { padding: 6px 12px; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 13px; }
+    .btn-act { background: var(--accent); } .btn-stage { background: var(--warn); color: #000; } .btn-done { background: var(--ok); }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; color: #fff; }
+    .l1 { background: var(--accent); } .l2 { background: var(--err); }
+    #app { filter: blur(3px); pointer-events: none; transition: 0.3s; }
+    #app.active { filter: none; pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <!-- Аудио для уведомлений -->
+  <audio id="beep" src="/static/beep.mp3" preload="auto"></audio>
+
+  <!-- Экран авторизации -->
+  <div id="auth-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <h2>Доступ к производству</h2>
+      <p>Введите ID сотрудника или отсканируйте QR</p>
+      <input id="auth-input" type="text" placeholder="Например: 65" autofocus>
+      <br>
+      <button onclick="authenticate()">Войти</button>
+    </div>
+  </div>
+
+  <!-- Основной интерфейс (заблокирован до входа) -->
+  <div id="app">
+    <h2>Поток производства <span id="user-display" style="font-size:14px;color:#666;"></span></h2>
+    <div class="controls">
+      <select id="station" disabled></select>
+      <select id="line" disabled>
+        <option value="all">Все линии</option>
+        <option value="1">Линия 1</option>
+        <option value="2">Линия 2</option>
+      </select>
+      <input id="oper_id" disabled placeholder="ID" readonly>
+      <button onclick="lockApp()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">Выход</button>
+    </div>
+    <table id="kitchen">
+      <thead><tr><th>Заказ</th><th>Лин.</th><th>Стол</th><th>Позиция</th><th>К‑во</th><th>Выдача</th><th>Этап</th><th>Действие</th></tr></thead>
+      <tbody><tr><td colspan="8" style="text-align:center;padding:20px;">Ожидание данных...</td></tr></tbody>
+    </table>
+  </div>
+
+<script>
+  let currentOper = '';
+  const seenIds = new Set(); // отслеживаем строки, чтобы не дублировать звук
+
+  const ACCESS = {
+    '0': 'ALL', '52': 'ALL', '77': 'ALL',
+    '31': 'bar', '32': 'bar', '33': 'bar', '34': 'bar', '35': 'bar', '36': 'bar', '37': 'bar', '38': 'bar', '39': 'bar', '40': 'bar',
+    '41': 'il', '42': 'il', '43': 'il', '44': 'il', '45': 'il', '46': 'il', '47': 'il', '48': 'il', '49': 'il', '50': 'il',
+    '61': 'hot', '62': 'hot',
+    '63': 'sal', '64': 'sal',
+    '65': 'ch1_1', '66': 'ch1_1', '67': 'ch1_1',
+    '68': 'ch1_2', '69': 'ch1_2', '70': 'ch1_2',
+    '71': 'ch2_1', '72': 'ch2_1', '73': 'ch2_1',
+    '74': 'ch2_2', '75': 'ch2_2', '76': 'ch2_2'
+  };
+
+  const STATIONS = {
+    'bar':  [{id:'bar_all', name:'Весь Бар (101-400)'}],
+    'il':   [{id:'il_drive', name:'ОкноГриль (601-700)'}],
+    'hot':  [{id:'hot', name:'Горячее (451-500)'}],
+    'sal':  [{id:'salads', name:'Салаты (551-600)'}],
+    'ch1_1':[{id:'chiry', name:'Чиры Л1 Этап1', stage:1}],
+    'ch1_2':[{id:'chiry', name:'Чиры Л1 Этап2', stage:2}],
+    'ch2_1':[{id:'chiry', name:'Чиры Л2 Этап1', stage:1}],
+    'ch2_2':[{id:'chiry', name:'Чиры Л2 Этап2', stage:2}],
+    'ALL':  [{id:'bar_all', name:'Весь Бар'}, {id:'hot', name:'Горячее'}, {id:'salads', name:'Салаты'}, {id:'il_drive', name:'ОкноГриль'}, {id:'chiry', name:'Чиры'}, {id:'banquet', name:'Банкет'}]
+  };
+
+  function authenticate() {
+    const id = document.getElementById('auth-input').value.trim();
+    if (ACCESS[id]) {
+      currentOper = id;
+      document.getElementById('oper_id').value = id;
+      document.getElementById('user-display').textContent = `(ID: ${id})`;
+      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      unlockUI(id);
+      loadData();
+    } else {
+      alert('❌ Доступ запрещён или неверный ID');
+    }
+  }
+
+  function lockApp() { location.reload(); }
+
+  function unlockUI(id) {
+    const allowed = ACCESS[id];
+    const stationSel = document.getElementById('station');
+    const lineSel = document.getElementById('line');
+    stationSel.innerHTML = '';
+    stationSel.disabled = false;
+    stationSel.classList.add('unlocked');
+
+    if (allowed === 'ALL') {
+      STATIONS['ALL'].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = s.name; stationSel.appendChild(opt);
+      });
+      lineSel.disabled = false; lineSel.classList.add('unlocked');
+      lineSel.style.display = '';
+    } else {
+      STATIONS[allowed].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = s.name; stationSel.appendChild(opt);
+      });
+      if (allowed.startsWith('ch1')) {
+        lineSel.value = '1';
+        lineSel.disabled = true;
+        lineSel.style.display = '';
+      } else if (allowed.startsWith('ch2')) {
+        lineSel.value = '2';
+        lineSel.disabled = true;
+        lineSel.style.display = '';
+      } else {
+        lineSel.style.display = 'none';
+      }
+    }
+    if (stationSel.options.length > 0) stationSel.options[0].selected = true;
+  }
+
+  function minutesFrom(ts) {
+    if (!ts) return 0;
+    const t = ts.replace(' ', 'T'); // для корректного парсинга формата 2026-08-08 12:34:56
+    const ms = Date.now() - new Date(t).getTime();
+    return Math.floor(ms / 60000);
+  }
+
+  function loadData() {
+    const station = document.getElementById('station').value;
+    const line = document.getElementById('line').value;
+
+    fetch(`/api/orders/active?station=${station}&oper_id=${currentOper}&line=${line}`)
+      .then(r => r.json())
+      .then(data => {
+        const tb = document.querySelector('#kitchen tbody');
+        tb.innerHTML = '';
+
+        if (!data || !data.length) {
+          tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">Нет активных заказов</td></tr>';
+          return;
+        }
+
+        data.forEach(row => {
+          // Логика звука: если строка новая и статус new/working — пикаем
+          const isNewRow = !seenIds.has(row.id) && (row.status === 'new' || row.status === 'working');
+          if (isNewRow) {
+            const beep = document.getElementById('beep');
+            if (beep) {
+              try { beep.currentTime = 0; beep.play().catch(() => {}); } catch(e) {}
+            }
+          }
+
+          // Подсветка просрочки >= 30 минут для new/working
+          const mins = minutesFrom(row.status_ts || row.created_at);
+          const isOverdue = (row.status === 'new' || row.status === 'working') && mins >= 30;
+
+          // Формируем кнопку и действие по диапазонам name_id (без «Выдача» — только кухня)
+          let btnText = 'Готово', btnCls = 'btn-act', action = 'ready';
+          let noBtnReason = '';
+          const nameId = parseInt(row.name_id) || 0;
+
+          if (nameId >= 401 && nameId <= 450) {
+            if (row.stage == 1) { btnText = 'Этап 1 готов'; action = 'working'; }
+            else if (row.stage == 2) { btnText = 'Этап 2 готов'; btnCls = 'btn-stage'; action = 'ready'; }
+            else { btnText = ''; noBtnReason = 'ready'; }
+          } else if (nameId >= 601 && nameId <= 700) {
+            if (row.stage == 1) { btnText = 'В работу'; action = 'working'; }
+            else if (row.stage == 2) { btnText = 'Готово'; btnCls = 'btn-stage'; action = 'ready'; }
+            else { btnText = ''; noBtnReason = 'ready'; }
+          } else if (row.status === 'ready') {
+            btnText = '';
+            noBtnReason = 'ready';
+          }
+
+          // Ограничение видимости кнопок по этапу для операторов Чир
+          if (currentOper >= '65' && currentOper <= '67' && row.stage !== 1) btnText = '';
+          if (currentOper >= '68' && currentOper <= '70' && row.stage !== 2) btnText = '';
+          if (currentOper >= '71' && currentOper <= '73' && row.stage !== 1) btnText = '';
+          if (currentOper >= '74' && currentOper <= '76' && row.stage !== 2) btnText = '';
+
+          // Если кнопки нет (оператор не на своём этапе) — всё равно показываем строку, но без кнопки
+          const hasActionBtn = !!btnText;
+
+          const tr = document.createElement('tr');
+          if (typeof row.stage !== 'undefined') tr.className = `s${row.stage}`;
+          if (isOverdue) {
+            tr.style.background = '#fdecea';
+            tr.style.borderLeft = '4px solid #d32f2f';
+          }
+
+          const tdOrder = document.createElement('td'); tdOrder.textContent = row.order_id;
+          const tdLine = document.createElement('td');
+          const spanBadge = document.createElement('span');
+          spanBadge.className = `badge l${row.production_line || 1}`;
+          spanBadge.textContent = `Л${row.production_line || 1}`;
+          tdLine.appendChild(spanBadge);
+
+          const tdTable = document.createElement('td'); tdTable.textContent = row.table_id;
+
+          const tdName = document.createElement('td');
+          const strong = document.createElement('strong');
+          strong.textContent = row.name;
+          tdName.appendChild(strong);
+
+          const tdQty = document.createElement('td'); tdQty.textContent = row.qty;
+
+          const tdPickup = document.createElement('td');
+          tdPickup.textContent = row.pickup_point === 'il_drive' ? 'ОкноГриль' : 'Бар';
+
+          const tdStage = document.createElement('td');
+          tdStage.textContent = `${row.stage || 1}`;
+          if (isOverdue) {
+            const span = document.createElement('span');
+            span.style.color = '#d32f2f';
+            span.style.fontWeight = '600';
+            span.textContent = ` (${mins} мин)`;
+            tdStage.appendChild(span);
+          }
+
+// Кнопка (безопасный вариант)
+          const tdAction = document.createElement('td');
+          if (hasActionBtn) {
+            const btn = document.createElement('button');
+            btn.className = `btn ${btnCls}`;
+            btn.textContent = btnText;
+            btn.addEventListener('click', () => updateStatus(row.id, action));
+            tdAction.appendChild(btn);
+          } else if (noBtnReason === 'ready' || row.status === 'ready') {
+            tdAction.textContent = 'На выдаче';
+            tdAction.style.color = '#198754';
+            tdAction.style.fontSize = '12px';
+          } else {
+            tdAction.textContent = 'Не ваш этап';
+            tdAction.style.color = '#999';
+          }
+
+          tr.appendChild(tdOrder);
+          tr.appendChild(tdLine);
+          tr.appendChild(tdTable);
+          tr.appendChild(tdName);
+          tr.appendChild(tdQty);
+          tr.appendChild(tdPickup);
+          tr.appendChild(tdStage);
+          tr.appendChild(tdAction);
+
+          tb.appendChild(tr);
+
+          seenIds.add(row.id);
+        });
+      })
+      .catch(e => console.error(e));
+  }
+
+  window.updateStatus = function(itemId, action){
+    const operId = (document.getElementById('oper_id').value || '').trim();
+    if (!operId){ alert('⚠️ Введите ID оператора'); return; }
+
+    const fd = new FormData();
+    fd.append('item_id', String(itemId));
+    fd.append('new_status', action);
+    fd.append('oper_id', operId);
+
+    fetch('/api/orders/status', { method:'POST', body: fd })
+      .then(r => r.json().then(j => ({ ok:r.ok, data:j })))
+      .then(res => {
+        if (res.ok){
+          loadData();
+        } else {
+          const msg = (res.data && (res.data.detail || res.data.error)) ? (res.data.detail || res.data.error) : 'Сервер отклонил запрос';
+          alert('❌ ' + msg);
+        }
+      })
+      .catch(e => alert('❌ Ошибка сети: ' + e.message));
+  };
+
+// Если в разметке уже используются старые onclick="updateItemStatus(...)",
+// привяжем их к новой функции:
+  if (!window.updateItemStatus) {
+    window.updateItemStatus = window.updateStatus;
+  }
+
+  setInterval(loadData, 3000);
+</script>
+</body>
+</html>

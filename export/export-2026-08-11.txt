@@ -1,0 +1,43 @@
+# Export day: 2026-08-11
+
+## SUMMARY
+Gross (items excl. cancelled): 0.00
+Cancelled items: 0
+Paid total: 0.00
+Tips total: 0.00
+
+## ITEMS
+
+## PAYMENTS
+
+## TIPS
+
+## DISCOUNTS
+
+## EVENTS
+ORD-093544	12	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:26
+ORD-093544	13	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:31
+ORD-093544	14	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:32
+ORD-090320	20	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:33
+ORD-090320	21	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:34
+ORD-090320	22	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:35
+ORD-090320	23	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:37
+ORD-220203	34	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:38
+ORD-220341	41	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:40
+ORD-220341	42	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:38:43
+ORD-093544	12	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:49
+ORD-093544	13	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:51
+ORD-093544	14	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:51
+ORD-090320	20	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:52
+ORD-090320	21	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:53
+ORD-090320	22	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:54
+ORD-090320	23	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:54
+ORD-220203	34	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:55
+ORD-220341	41	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:56
+ORD-220341	42	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:38:58
+ORD-090320	24	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:39:03
+ORD-090320	24	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:39:04
+ORD-090320	25	status_change		{"status": "ready", "stage": 1}	77	1	2026-08-11 19:39:05
+ORD-090320	25	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:39:06
+ORD-211404	8	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:39:22
+ORD-213407	9	status_change		{"status": "served", "stage": 1}	77	1	2026-08-11 19:39:23

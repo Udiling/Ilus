@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель директора</title>
+  <style>
+    body{font-family:system-ui;padding:20px;background:#f8f9fa;margin:0}
+    h2{margin:0 0 15px}
+    .stats{display:flex;gap:20px;margin:10px 0;padding:15px;background:#e9ecef;border-radius:6px;font-weight:500}
+    .stats span{color:#0b5ed7;font-weight:bold}
+    .filters{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+    input,select,button{padding:8px 12px;border:1px solid #ccc;border-radius:4px;font-size:14px}
+    button{background:#0a58ca;color:#fff;cursor:pointer;border:none}
+    button:hover{background:#084298}
+    table{width:100%;border-collapse:collapse;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.05)}
+    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+    th{background:#f1f3f5;font-weight:600}
+    tfoot td{font-weight:bold;border-top:2px solid #dee2e6}
+  </style>
+</head>
+<body>
+  <div id="auth-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999">
+    <div style="background:#fff;padding:24px;border-radius:10px;text-align:center;min-width:280px">
+      <h3 style="margin:0 0 12px">Панель директора</h3>
+      <p style="color:#666;font-size:14px">Доступ: ID 0, 52, 77</p>
+      <input id="dir-login-id" placeholder="ID оператора" style="padding:10px;width:200px;margin-bottom:10px">
+      <br>
+      <button onclick="directorLogin()" style="background:#0a58ca;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer">Войти</button>
+    </div>
+  </div>
+  <div id="director-app" style="display:none">
+  <h2>Отчётность и контроль</h2>
+  <!-- Панель управления директором -->
+  <div class="panel" style="margin-top:20px; padding:15px; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.06)">
+    <h3 style="margin:0 0 10px">Управление днём</h3>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+      <button id="btn-export" style="background:#0d6efd;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer">📤 Экспорт дня</button>
+      <select id="staff-select" style="padding:8px;border:1px solid #ddd;border-radius:6px"><option value="">Выберите сотрудника</option></select>
+      <button id="btn-call-staff" style="background:#198754;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer">📣 Вызвать</button>
+      <label for="max-table" style="margin-left:8px;font-weight:600;white-space:nowrap">Max_Table</label>
+      <input id="max-table" type="number" min="1" max="25" value="25" title="Количество столиков" style="width:72px;padding:8px;border:1px solid #ddd;border-radius:6px;text-align:center">
+      <button id="btn-save-max-table" style="background:#6f42c1;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer">💾 Столы</button>
+    </div>
+    <div id="export-status" style="margin-top:8px;color:#6c757d"></div>
+  </div>
+
+  <!-- Панель: Брони и мероприятия -->
+  <div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+    <h3 style="margin:0 0 10px">Брони и мероприятия</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+      <input id="resv-day" type="date" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+      <button onclick="loadResvDay()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Показать</button>
+      <button onclick="document.getElementById('resv-day').value=new Date().toISOString().slice(0,10);loadResvDay()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Сегодня</button>
+      <button onclick="dirBlockPdf('reservations','resv-day')" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+      <label style="font-weight:600"><input type="checkbox" id="resv-only-orders" onchange="loadResvDay()"> только с предзаказом</label>
+    </div>
+    <div id="resv-list" style="max-height:320px;overflow:auto;font-size:13px"></div>
+  </div>
+
+  <div class="stats">Выручка: <span id="rev">0</span> ₽  |  Продано: <span id="qty">0</span> шт  |  Активных: <span id="act">0</span></div>
+
+  <div class="filters">
+    <select id="f_status"><option value="">Все статусы</option><option value="new">Новые</option><option value="ready">Готово</option><option value="served">Подано</option></select>
+    <input id="f_oper" placeholder="ID оператора">
+    <input id="f_table" placeholder="Стол">
+    <button onclick="loadReport()">Применить</button>
+    <button onclick="location.reload()" style="background:#6c757d">Обновить</button>
+  </div>
+ 
+  <!-- Панель: Печать/Уведомления -->
+  <div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+    <h3 style="margin:0 0 10px">Очередь печати / уведомлений</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+      <select id="pq-target" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+        <option value="bar">bar</option>
+        <option value="kitchen">kitchen</option>
+        <option value="client">client</option>
+        <option value="custom">custom</option>
+      </select>
+      <textarea id="pq-payload" rows="3" placeholder='JSON payload, например: {"order_id":"ORD-123","lines":[{"txt":"Привет"}]}' style="flex:1;min-width:380px;padding:8px;border:1px solid #ddd;border-radius:6px"></textarea>
+      <div style="display:flex;gap:6px;flex-direction:column">
+        <button onclick="pqQueue()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">➕ Поставить в очередь</button>
+        <button onclick="pqReload()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">🔄 Обновить список (new)</button>
+        <button onclick="dirBlockPdf('queue', null)" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+      </div>
+    </div>
+
+    <div id="pq-list" style="font-family:monospace;color:#495057;white-space:pre-wrap;background:#f8f9fa;border:1px solid #eee;border-radius:8px;padding:10px;max-height:240px;overflow:auto">—</div>
+  </div>
+
+  <!-- Панель: Снимок дня -->
+  <div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+    <h3 style="margin:0 0 10px">Снимок дня (агрегаты)</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+      <button onclick="snapToday()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📸 Снимок за сегодня</button>
+      <input id="snap-date" type="date" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+      <button onclick="snapForDate()" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📸 Снимок за дату</button>
+      <button onclick="dirBlockPdf('snapshot','snap-date')" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+      <label style="margin-left:12px;font-size:13px;color:#555">
+        <input type="checkbox" id="snap-auto" onchange="toggleSnapAuto(this.checked)"> авто‑снимок каждый час
+      </label>
+    </div>
+    <div id="snap-status" style="font-family:monospace;color:#495057;white-space:pre-wrap;background:#f8f9fa;border:1px solid #eee;border-radius:8px;padding:10px;max-height:200px;overflow:auto">—</div>
+  </div>
+  
+  <div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <h3 style="margin:0 10px 0 0">Продажи (активные заказы)</h3>
+      <button onclick="toggleSales()" id="sales-toggle" style="background:#6c757d;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer">▼ Развернуть</button>
+      <button onclick="dirBlockPdf('sales', null)" style="background:#dc3545;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+    </div>
+    <table id="sales-table" style="display:none">
+      <thead><tr><th>Заказ</th><th>Оператор</th><th>Стол</th><th>Блюдо</th><th>Цена</th><th>Кол‑во</th><th>Статус</th><th>Время</th></tr></thead>
+      <tbody id="data"></tbody>
+      <tfoot><tr><td colspan="4">Итого</td><td id="sum_price">0</td><td id="sum_qty">0</td><td colspan="2"></td></tr></tfoot>
+    </table>
+  </div>
+  </div><!-- /director-app -->
+
+  <script>
+  const DIRECTOR_IDS = ['0','52','77'];
+  function directorLogin() {
+    const id = document.getElementById('dir-login-id').value.trim();
+    if (!DIRECTOR_IDS.includes(id)) {
+      alert('❌ Доступ только для ID: 0, 52, 77');
+      return;
+    }
+    localStorage.setItem('last_oper', id);
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('director-app').style.display = 'block';
+    if (typeof loadReport === 'function') loadReport();
+    if (typeof loadStaffList === 'function') loadStaffList();
+    if (typeof loadMaxTable === 'function') loadMaxTable();
+  }
+  (function(){
+    const saved = localStorage.getItem('last_oper');
+    if (saved && DIRECTOR_IDS.includes(saved)) {
+      document.getElementById('dir-login-id').value = saved;
+      directorLogin();
+    }
+  })();
+  </script>
+
+  <script>
+  let snapTimer = null;
+  function snapToday(){
+    const fd=new FormData();
+    fetch('/api/summary/snapshot_day',{method:'POST',body:fd})
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.status==='ok'){
+          document.getElementById('snap-status').textContent =
+            `day=${d.day}\nitems_gross=${d.items_gross}\npaid=${d.paid}\ntips=${d.tips}\ncancels=${d.cancels_count}\nchiry_wait_avg=${d.chiry_wait_avg} min`;
+        } else {
+          document.getElementById('snap-status').textContent = 'Ошибка снимка: ' + (d.detail || JSON.stringify(d));
+        }
+      })
+      .catch(e => document.getElementById('snap-status').textContent = 'Ошибка сети: ' + e.message);
+  }
+
+  function snapForDate(){
+    const day = (document.getElementById('snap-date').value || '').trim();
+    if(!day){ alert('Выберите дату'); return; }
+    const fd=new FormData(); fd.append('day', day);
+    fetch('/api/summary/snapshot_day',{method:'POST',body:fd})
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.status==='ok'){
+          document.getElementById('snap-status').textContent =
+            `day=${d.day}\nitems_gross=${d.items_gross}\npaid=${d.paid}\ntips=${d.tips}\ncancels=${d.cancels_count}\nchiry_wait_avg=${d.chiry_wait_avg} min`;
+        } else {
+          document.getElementById('snap-status').textContent = 'Ошибка снимка: ' + (d.detail || JSON.stringify(d));
+        }
+      })
+      .catch(e => document.getElementById('snap-status').textContent = 'Ошибка сети: ' + e.message);
+  }
+
+  function toggleSnapAuto(on){
+    if (snapTimer){ clearInterval(snapTimer); snapTimer = null; }
+    if (on){
+      // сразу снимок и затем каждый час
+      snapToday();
+      snapTimer = setInterval(snapToday, 60*60*1000);
+      try{ localStorage.setItem('snap_auto','1'); }catch(e){}
+    } else {
+      try{ localStorage.setItem('snap_auto','0'); }catch(e){}
+    }
+  }
+
+  // восстановление флага «авто-снимок»
+  (function(){
+    let v = '0';
+    try{ v = localStorage.getItem('snap_auto') || '0'; }catch(e){}
+    const chk = document.getElementById('snap-auto');
+    if (chk){ chk.checked = (v === '1'); if (chk.checked) toggleSnapAuto(true); }
+  })();
+  </script>
+		  
+  <script>
+  function pqQueue(){
+    const t = document.getElementById('pq-target').value.trim();
+    const p = document.getElementById('pq-payload').value.trim();
+    if(!p){ alert('Введите JSON payload'); return; }
+    // быстрая проверка JSON до отправки
+    try{ JSON.parse(p); }catch(e){ alert('payload не JSON: '+e.message); return; }
+    const fd = new FormData(); fd.append('target', t); fd.append('payload_json', p);
+    fetch('/api/print/queue',{method:'POST',body:fd})
+      .then(r=>r.json())
+      .then(d=>{
+        if(d.status==='queued'){ pqReload(); }
+        else{ alert('Ошибка очереди: '+(d.detail||JSON.stringify(d))); }
+      })
+      .catch(e=> alert('Ошибка сети: '+e.message));
+  }
+  function pqReload(){
+    fetch('/api/print/queue?status=new&limit=50')
+      .then(r=>r.json())
+      .then(list=>{
+        const box = document.getElementById('pq-list');
+        if(!Array.isArray(list) || !list.length){ box.textContent='—'; return; }
+        let out='';
+        list.forEach(r=>{
+          let shortPayload = r.payload; 
+          if(shortPayload.length > 120) shortPayload = shortPayload.slice(0,117)+'...';
+          out+=`#${r.id}  [${r.target}]  ${r.ts}  status=${r.status}\n  ${shortPayload}\n  → `
+             +`[<a href="#" onclick="return pqAck(${r.id},'sent')">sent</a>] `
+             +`[<a href="#" onclick="return pqAck(${r.id},'failed')">failed</a>]\n\n`;
+        });
+        box.innerHTML = out;
+      })
+      .catch(e=> alert('Ошибка сети: '+e.message));
+  }
+  function pqAck(id, st){
+    const fd=new FormData(); fd.append('id', String(id)); fd.append('status', st);
+    fetch('/api/print/ack',{method:'POST',body:fd})
+      .then(r=>r.json())
+      .then(d=>{ if(d.status==='ok'){ pqReload(); } else { alert('Ошибка ack: '+(d.detail||JSON.stringify(d))); } })
+      .catch(e=> alert('Ошибка сети: '+e.message));
+    return false;
+  }
+  // первичная загрузка
+  pqReload();
+  </script>
+
+  <script>
+    function loadReport(){
+      const st = document.getElementById('f_status').value;
+      const op = document.getElementById('f_oper').value.trim();
+      const tbl = document.getElementById('f_table').value.trim();
+      let url = '/api/orders/active';
+      
+      fetch(url)
+        .then(r=>r.json())
+        .then(d=>{
+          let rev=0, q=0, act=0;
+          const tbody = document.getElementById('data');
+          tbody.innerHTML = '';
+          
+          d.forEach(r=>{
+            let show = true;
+            if(st && r.status !== st) show = false;
+            if(op && r.oper_id !== op) show = false;
+            if(tbl && r.table_id !== tbl) show = false;
+            if(!show) return;
+            
+            const lineTotal = Number(r.price) * Number(r.qty);
+            rev += lineTotal;
+            q += parseFloat(r.qty);
+            if(r.status !== 'served') act++;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r.order_id}</td><td>${r.oper_id}</td><td>${r.table_id}</td><td>${r.name}</td><td>${r.price}</td><td>${r.qty}</td><td>${r.status}</td><td>${r.created_at}</td>`;
+            tbody.appendChild(tr);
+          });
+          
+          document.getElementById('rev').textContent = rev.toFixed(2);
+          document.getElementById('qty').textContent = q;
+          document.getElementById('act').textContent = act;
+          document.getElementById('sum_price').textContent = rev.toFixed(2) + ' ₽';
+          document.getElementById('sum_qty').textContent = q.toFixed(1);
+        })
+        .catch(e => console.error('Ошибка загрузки:', e));
+    }
+
+    setInterval(loadReport, 5000);
+    loadReport();
+  </script>
+
+  <script>
+    // --- МОНИТОР ЧИРОВ ДЛЯ ДИРЕКТОРА ---
+    function initChiryMonitor() {
+      const container = document.createElement('div');
+      container.id = 'chiry-monitor';
+      container.style.cssText = 'border:2px dashed #dc3545; padding:15px; margin-top:30px; border-radius:10px; background:#fff8e1;';
+      container.innerHTML = `
+        <h3 style="margin:0 0 10px; color:#856404;">📡 Монитор очереди Чиры</h3>
+        <p id="chiry-wait" style="margin:5px 0; font-weight:500;">Загрузка данных...</p>
+        <button id="btn-activate-l2" onclick="activateLine2()" style="display:none; background:#dc3545; color:#fff; padding:10px 20px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:8px;">🔴 Пуск второй линии</button>
+        <button id="btn-stop-l2" onclick="deactivateLine2()" style="display:none; background:#6c757d; color:#fff; padding:8px 16px; border:none; border-radius:5px; cursor:pointer; margin-top:5px;">⏹ Остановить линию 2</button>
+      `;
+      document.querySelector('body').appendChild(container);
+    }
+
+    function updateChiryStatus() {
+      const operId = document.getElementById('oper_id')?.value || localStorage.getItem('last_oper') || '0';
+      fetch(`/api/director/chiry-status?oper_id=${operId}`)
+        .then(r => r.json())
+        .then(d => {
+          const waitEl = document.getElementById('chiry-wait');
+          const actBtn = document.getElementById('btn-activate-l2');
+          const stopBtn = document.getElementById('btn-stop-l2');
+
+          if (d.wait_time > 0) {
+            waitEl.textContent = `Ожидание самого старого заказа: ${d.wait_time} мин.`;
+            if (d.wait_time >= d.threshold && !d.line2_active) {
+              waitEl.innerHTML += `<br><span style="color:#dc3545;font-weight:bold;">⚠️ Время выдачи Чиров превысило ${d.wait_time} минут</span>`;
+              actBtn.style.display = 'inline-block';
+            } else {
+              actBtn.style.display = 'none';
+            }
+          } else {
+            waitEl.textContent = 'Очередь Чиры пуста ✅';
+            actBtn.style.display = 'none';
+          }
+          stopBtn.style.display = d.line2_active ? 'inline-block' : 'none';
+        })
+        .catch(e => console.error('Ошибка мониторинга:', e));
+    }
+
+    function activateLine2() {
+      const pin = prompt('Введите PIN-код активации:');
+      if (!pin) return;
+      const fd = new FormData();
+      fd.append('pin', pin);
+      fd.append('oper_id', localStorage.getItem('last_oper') || '0');
+
+      fetch('/api/director/activate-line2', { method: 'POST', body: fd })
+        .then(r => {
+          if (r.ok) {
+            alert('✅ Вторая линия активирована! Новые заказы Чиры пойдут на Л2.');
+            updateChiryStatus();
+          } else {
+            return r.json().then(err => alert('❌ ' + (err.detail || 'Ошибка сервера')));
+          }
+        })
+        .catch(e => alert('Ошибка сети: ' + e.message));
+    }
+
+    function deactivateLine2() {
+      const fd = new FormData();
+      fd.append('oper_id', localStorage.getItem('last_oper') || '0');
+      fetch('/api/director/deactivate-line2', { method: 'POST', body: fd })
+        .then(() => {
+          alert('✅ Линия 2 остановлена. Поток вернулся на Линию 1.');
+          updateChiryStatus();
+        })
+        .catch(e => alert('Ошибка сети: ' + e.message));
+    }
+
+    // Инициализация при загрузке страницы
+    initChiryMonitor();
+    updateChiryStatus();
+    setInterval(updateChiryStatus, 30000);
+  </script> 
+
+  <script>
+    // Загрузка списка операторов
+    function loadStaff() {
+      fetch('/api/operators/list')
+        .then(r => r.json())
+        .then(list => {
+          const sel = document.getElementById('staff-select');
+          sel.innerHTML = '<option value="">Выберите сотрудника</option>';
+          list.forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o.oper_id;
+            opt.textContent = `${o.oper_id} — ${o.name || o.oper || 'Сотрудник'}`;
+            sel.appendChild(opt);
+          });
+        })
+        .catch(() => {});
+    }
+
+    // Экспорт дня
+    document.getElementById('btn-export')?.addEventListener('click', () => {
+      const fdExp = new FormData();
+      fdExp.append('oper_id', localStorage.getItem('last_oper') || '0');
+      fetch('/api/export/day', { method: 'POST', body: fdExp })
+        .then(r => r.json().then(d => ({ ok: r.ok, d })))
+        .then(({ ok, d }) => {
+          const el = document.getElementById('export-status');
+          if (ok && d.status === 'ok') el.textContent = `Экспорт готов: ${d.file}`;
+          else el.textContent = `Ошибка экспорта: ${(d && d.detail) || 'unknown'}`;
+        })
+        .catch(e => { document.getElementById('export-status').textContent = 'Ошибка сети: ' + e.message; });
+    });
+
+    // Вызов сотрудника
+    document.getElementById('btn-call-staff')?.addEventListener('click', () => {
+      const sel = document.getElementById('staff-select');
+      const val = sel.value;
+      if (!val) return alert('Выберите сотрудника');
+      const reason = prompt('Причина вызова (необязательно):', '');
+      const fd = new FormData();
+      fd.append('staff_id', val);
+      fd.append('reason', reason || '');
+      fetch('/api/call/staff', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => alert(d.status === 'staff_notified' ? '✅ Вызов отправлен' : '❌ Ошибка'))
+        .catch(e => alert('Ошибка сети: ' + e.message));
+    });
+
+    // Инициализация
+    loadStaff();
+
+    function loadMaxTable() {
+      fetch('/api/settings/max-table')
+        .then(r => r.json())
+        .then(d => {
+          const el = document.getElementById('max-table');
+          if (el && d.max_table) {
+            el.min = d.min || 1;
+            el.max = d.max || 25;
+            el.value = d.max_table;
+          }
+        })
+        .catch(() => {});
+    }
+
+    document.getElementById('btn-save-max-table')?.addEventListener('click', () => {
+      const el = document.getElementById('max-table');
+      const n = parseInt(el.value, 10);
+      if (!n || n < 1) return alert('Укажите число столов');
+      const pin = prompt('PIN для изменения Max_Table:');
+      if (!pin) return;
+      const fd = new FormData();
+      fd.append('pin', pin);
+      fd.append('oper_id', localStorage.getItem('last_oper') || '0');
+      fd.append('max_table', String(n));
+      fetch('/api/director/max-table', { method: 'POST', body: fd })
+        .then(r => r.json().then(d => ({ ok: r.ok, d })))
+        .then(({ ok, d }) => {
+          const st = document.getElementById('export-status');
+          if (ok && d.status === 'ok') {
+            el.value = d.max_table;
+            if (st) st.textContent = 'Max_Table: ' + d.max_table + ' столов';
+          } else {
+            alert('❌ ' + (d.detail || 'Не удалось сохранить Max_Table'));
+          }
+        })
+        .catch(e => alert('Ошибка сети: ' + e.message));
+    });
+    loadMaxTable();
+  </script>
+<!-- Панель: Чаевые по официантам -->
+<div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px">Чаевые по официантам</h3>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+    <input id="tips-date" type="date" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+    <button onclick="loadTipsByWaiter()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Показать</button>
+    <button onclick="dirBlockPdf('tips','tips-date')" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+  </div>
+  <div id="tips-total" style="margin-bottom:8px;color:#495057">—</div>
+  <table id="tips-table" style="width:100%;border-collapse:collapse;background:#fff">
+    <thead>
+      <tr style="background:#f8f9fa">
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Официант (ID)</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">Заказов с чаевыми</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">Сумма чаевых</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Период</th>
+      </tr>
+    </thead>
+    <tbody><tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr></tbody>
+  </table>
+</div>
+
+<script>
+function loadTipsByWaiter(){
+  const day = (document.getElementById('tips-date').value||'').trim();
+  const url = day ? (`/api/report/tips_by_waiter?day=${encodeURIComponent(day)}`) : '/api/report/tips_by_waiter';
+  fetch(url).then(r=>r.json()).then(d=>{
+    document.getElementById('tips-total').textContent = `День: ${d.day} | Итого чаевых: ${Number(d.total_tips||0).toFixed(2)} ₽`;
+    const tb = document.querySelector('#tips-table tbody');
+    if(!d.items || !d.items.length){
+      tb.innerHTML = '<tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr>';
+      return;
+    }
+    let out='';
+    d.items.forEach(r=>{
+      out += `<tr>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.waiter_name||''} (${r.waiter_id})</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${r.orders_with_tips}</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${Number(r.sum_tips||0).toFixed(2)} ₽</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.first_tip||'-'} — ${r.last_tip||'-'}</td>
+      </tr>`;
+    });
+    tb.innerHTML = out;
+  }).catch(e=>{
+    document.getElementById('tips-total').textContent = 'Ошибка: ' + e.message;
+  });
+}
+</script>
+
+<!-- Панель: Оценки обслуживания за день -->
+<div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px">Оценки обслуживания за день</h3>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+    <input id="fb-date" type="date" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+    <button onclick="loadFeedback()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Показать</button>
+    <button onclick="feedbackPdf()" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+  </div>
+  <div id="fb-total" style="margin-bottom:8px;color:#495057">—</div>
+  <table id="fb-table" style="width:100%;border-collapse:collapse;background:#fff">
+    <thead>
+      <tr style="background:#f8f9fa">
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Время</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Заказ</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Стол</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Оценка</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Комментарий</th>
+      </tr>
+    </thead>
+    <tbody><tr><td colspan="5" style="padding:10px;color:#6c757d">Нет данных</td></tr></tbody>
+  </table>
+</div>
+
+<script>
+function loadFeedback(){
+  const day = (document.getElementById('fb-date').value||'').trim();
+  const url = day ? (`/api/feedback/day?day=${encodeURIComponent(day)}`) : '/api/feedback/day';
+  fetch(url).then(r=>r.json()).then(d=>{
+    document.getElementById('fb-total').textContent =
+      `День: ${d.day} | Оценок: ${d.count} | Средний балл: ${d.count ? d.avg_rating : '—'}`;
+    const tb = document.querySelector('#fb-table tbody');
+    if(!d.items || !d.items.length){
+      tb.innerHTML = '<tr><td colspan="5" style="padding:10px;color:#6c757d">Нет данных</td></tr>';
+      return;
+    }
+    let out='';
+    d.items.forEach(r=>{
+      const t = String(r.created_at||'').slice(11,16);
+      out += `<tr>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${t}</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.order_id||''}</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.table_id||'—'}</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5;color:#ffc107;font-size:15px">${'★'.repeat(r.rating)}</td>
+        <td style="padding:8px;border-bottom:1px solid #f1f3f5">${(r.comment||'—')}</td>
+      </tr>`;
+    });
+    tb.innerHTML = out;
+  }).catch(e=>{
+    document.getElementById('fb-total').textContent = 'Ошибка: ' + e.message;
+  });
+}
+function feedbackPdf(){
+  const day = (document.getElementById('fb-date').value||'').trim();
+  const oper = localStorage.getItem('last_oper') || '0';
+  const url = `/api/feedback/day_pdf?oper_id=${encodeURIComponent(oper)}` + (day ? `&day=${encodeURIComponent(day)}` : '');
+  fetch(url).then(r=>{
+    if(!r.ok) return r.json().then(d=>{ throw new Error(d.detail||'Ошибка PDF'); });
+    return r.blob();
+  }).then(blob=>{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `feedback-${day || new Date().toISOString().slice(0,10)}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  }).catch(e=>alert('❌ ' + e.message));
+}
+</script>
+
+<div class="panel" style="margin-top:20px;padding:15px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px">Скидки за день</h3>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+    <input id="disc-date" type="date" style="padding:8px;border:1px solid #ddd;border-radius:6px">
+    <input id="disc-limit" type="number" min="1" value="200" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:120px" />
+    <button onclick="loadDiscounts()" style="background:#0d6efd;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Показать</button>
+    <button onclick="dirBlockPdf('discounts','disc-date')" style="background:#dc3545;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">📄 Сформировать ПДФ</button>
+  </div>
+
+  <div id="disc-summary" style="margin-bottom:8px;color:#495057">—</div>
+
+  <h4 style="margin:8px 0">По операторам</h4>
+  <table id="disc-byop" style="width:100%;border-collapse:collapse;background:#fff;margin-bottom:10px">
+    <thead>
+      <tr style="background:#f8f9fa">
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Оператор (ID)</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">Кол-во скидок</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">Средний %</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">Макс %</th>
+      </tr>
+    </thead>
+    <tbody><tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr></tbody>
+  </table>
+
+  <h4 style="margin:8px 0">Список скидок (хронология)</h4>
+  <table id="disc-list" style="width:100%;border-collapse:collapse;background:#fff">
+    <thead>
+      <tr style="background:#f8f9fa">
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Время</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Заказ</th>
+        <th style="text-align:right;border-bottom:1px solid #eee;padding:8px">%</th>
+        <th style="text-align:left;border-bottom:1px solid #eee;padding:8px">Оператор</th>
+      </tr>
+    </thead>
+    <tbody><tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr></tbody>
+  </table>
+</div>
+
+<script>
+function loadDiscounts(){
+  const day = (document.getElementById('disc-date').value||'').trim();
+  const limit = parseInt(document.getElementById('disc-limit').value||'200', 10);
+  const url = day ? (`/api/report/discounts_by_day?day=${encodeURIComponent(day)}&limit=${limit}`) 
+                  : (`/api/report/discounts_by_day?limit=${limit}`);
+  fetch(url).then(r => r.json()).then(d => {
+    document.getElementById('disc-summary').textContent =
+      `День: ${d.day} | Всего скидок: ${d.summary.count} | Средний %: ${Number(d.summary.avg_percent||0).toFixed(2)} | Макс %: ${Number(d.summary.max_percent||0).toFixed(2)}`;
+
+    // by operator
+    const tb1 = document.querySelector('#disc-byop tbody');
+    if(!d.by_operator || !d.by_operator.length){
+      tb1.innerHTML = '<tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr>';
+    } else {
+      let out1 = '';
+      d.by_operator.forEach(r => {
+        out1 += `<tr>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.oper_name||''} (${r.set_by_oper_id})</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${r.cnt}</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${Number(r.avg_pct||0).toFixed(2)}</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${Number(r.max_pct||0).toFixed(2)}</td>
+        </tr>`;
+      });
+      tb1.innerHTML = out1;
+    }
+
+    // records list
+    const tb2 = document.querySelector('#disc-list tbody');
+    if(!d.records || !d.records.length){
+      tb2.innerHTML = '<tr><td colspan="4" style="padding:10px;color:#6c757d">Нет данных</td></tr>';
+    } else {
+      let out2 = '';
+      d.records.forEach(r => {
+        out2 += `<tr>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.ts}</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.order_id}</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5;text-align:right">${Number(r.percent||0).toFixed(2)}</td>
+          <td style="padding:8px;border-bottom:1px solid #f1f3f5">${r.set_by_oper_id}</td>
+        </tr>`;
+      });
+      tb2.innerHTML = out2;
+    }
+  }).catch(e => {
+    document.getElementById('disc-summary').textContent = 'Ошибка: ' + e.message;
+  });
+}
+
+// ===== Брони и мероприятия =====
+function loadResvDay() {
+  const day = document.getElementById('resv-day').value || new Date().toISOString().slice(0, 10);
+  const onlyOrders = document.getElementById('resv-only-orders').checked;
+  fetch('/api/reservations?day=' + day)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      const box = document.getElementById('resv-list');
+      if (!d) { box.innerHTML = 'Ошибка загрузки'; return; }
+      let items = d.items || [];
+      if (onlyOrders) items = items.filter(r => r.order_json && r.order_json !== '[]' && r.order_json !== 'null');
+      if (!items.length) { box.innerHTML = '<div style="color:#6c757d;padding:8px">Броней нет</div>'; return; }
+      box.innerHTML = items.map(r => {
+        const cancelled = (r.status || 'Активна') === 'Отменен';
+        const closed = Number(r.is_closed_event) ? ' <b style="color:#dc3545">🔒 ЗАКРЫТОЕ</b>' : '';
+        const child = r.parent_res_id ? ' <i style="color:#6c757d">(мероприятие, стол основной брони ' + r.parent_res_id + ')</i>' : '';
+        const hasOrder = r.order_json && r.order_json !== '[]' && r.order_json !== 'null';
+        return `<div style="border-bottom:1px solid #f1f3f5;padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;${cancelled ? 'opacity:.55;text-decoration:line-through' : ''}">
+          <b>№${r.id}</b> · ${String(r.res_time).slice(0,5)} · Стол ${r.table_id}${closed}${child}
+          · ${(r.guest_name || '')} · ${(r.phone || '')}
+          ${r.guests_count ? ' · гостей: ' + r.guests_count : ''}
+          ${cancelled ? ' <b style="color:#dc3545">ОТМЕНЕН</b>' : ''}
+          ${hasOrder ? ` · <a href="#" onclick="resvDetails(${r.id});return false" style="color:#0d6efd">заказ</a>` : (!cancelled ? ' <i style="color:#6c757d">без предзаказа</i>' : '')}
+          ${Number(r.advance_amount) > 0 ? ' · аванс: ' + Number(r.advance_amount).toFixed(2) + ' ₽ (' + (r.advance_method || '—') + ')' : ''}
+          ${hasOrder && !cancelled ? `<button onclick="window.open('/api/reservations/order_pdf?res_id=${r.id}','_blank')" style="background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer">📄 PDF</button>` : ''}
+          ${!cancelled ? `<input type="datetime-local" id="cnf-${r.id}" title="Время уведомления (для отмены по инициативе кафе)" style="padding:3px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+          <button onclick="dirCancelReq(${r.id},'${String(r.res_date)}','${String(r.res_time).slice(0,5)}','${r.table_id}','${(r.phone || '').replace(/'/g, '')}','${(r.guest_name || '').replace(/'/g, '')}')" style="background:#6c757d;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer">✖ Отменить</button>` : ''}
+        </div>`;
+      }).join('');
+    })
+    .catch(e => document.getElementById('resv-list').innerHTML = 'Ошибка: ' + e.message);
+}
+
+function resvDetails(resId) {
+  fetch('/api/reservations/order?res_id=' + resId)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) return alert('Бронь не найдена');
+      let html = 'Гость: ' + (d.guest_name || '') + ' · ' + (d.phone || '') +
+        ' · гостей: ' + (d.guests_count || 0) + '\nИтого: ' + Number(d.total || 0).toFixed(2) + ' ₽' +
+        ' · аванс: ' + Number(d.advance_amount || 0).toFixed(2) + ' ₽ (' + (d.advance_method || '—') + ')\n\n';
+      (d.items || []).forEach(i => html += `${i.name} × ${i.qty} = ${(i.price * i.qty).toFixed(2)} ₽\n`);
+      alert(html);
+    });
+}
+document.getElementById('resv-day').value = new Date().toISOString().slice(0, 10);
+
+// ===== Сворачивание таблицы продаж + PDF по блокам =====
+function toggleSales() {
+  const tbl = document.getElementById('sales-table');
+  const btn = document.getElementById('sales-toggle');
+  const hidden = tbl.style.display === 'none';
+  tbl.style.display = hidden ? 'table' : 'none';
+  btn.textContent = hidden ? '▲ Свернуть' : '▼ Развернуть';
+}
+
+function dirBlockPdf(block, dateInputId) {
+  const operId = localStorage.getItem('last_oper') || '';
+  let day = '';
+  if (dateInputId) day = (document.getElementById(dateInputId).value || '').trim();
+  if (!day) day = new Date().toISOString().slice(0, 10);
+  window.open('/api/director/block_pdf?block=' + encodeURIComponent(block) +
+    '&day=' + encodeURIComponent(day) + '&oper_id=' + encodeURIComponent(operId), '_blank');
+}
+
+// ===== Отмена брони/банкета (у каждой брони) + конфликты закрытых банкетов =====
+let cancelreqQueue = [];
+
+function fmtResShort(x) {
+  const p = String(x.res_date).split('-');
+  return p[2] + '.' + p[1] + '.' + p[0].slice(2) + '_' + String(x.res_time).slice(0, 5) +
+    '_' + x.table_id + '_' + (x.phone || '') + '_' + (x.guest_name || '');
+}
+
+function dirCancelReq(id, res_date, res_time, table_id, phone, guest_name) {
+  cancelreqQueue.push({ id, res_date, res_time, table_id, phone, guest_name });
+  showNextCancelReq();
+}
+
+function showNextCancelReq() {
+  const item = cancelreqQueue.shift();
+  if (!item) return;
+  document.getElementById('cancelreq-text').textContent =
+    'Отменить бронь ' + fmtResShort(item) + ' (ОБЯЗАТЕЛЬНО: СМС затем звонок)';
+  document.getElementById('cancelreq-notify').value = '';
+  document.getElementById('cancelreq-pin').value = '';
+  document.getElementById('cancelreq-time-row').style.display = 'none';
+  document.getElementsByName('cancelreq-init').forEach(r => r.checked = r.value === 'client');
+  document.getElementById('cancelreq-overlay').style.display = 'flex';
+}
+
+function cancelreqToggleTime() {
+  const v = document.querySelector('input[name="cancelreq-init"]:checked').value;
+  document.getElementById('cancelreq-time-row').style.display = v === 'cafe' ? 'block' : 'none';
+}
+
+function cancelreqConfirm() {
+  const item = cancelreqQueue[0];
+  if (!item) return;
+  const fd = new FormData();
+  fd.append('res_id', item.id);
+  fd.append('pin', document.getElementById('cancelreq-pin').value.trim());
+  fd.append('initiator', document.querySelector('input[name="cancelreq-init"]:checked').value);
+  const nt = document.getElementById('cancelreq-notify').value;
+  if (nt) fd.append('notify_time', nt.replace('T', ' '));
+  fetch('/api/reservations/cancel', { method: 'POST', body: fd })
+    .then(r => r.json().then(d => ({ ok: r.ok, d })))
+    .then(({ ok, d }) => {
+      if (!ok) throw new Error(d.detail || 'Ошибка');
+      cancelreqQueue.shift();
+      document.getElementById('cancelreq-overlay').style.display = 'none';
+      localStorage.setItem('d_cancel_' + item.id, '1');
+      let msg = '✅ Бронь №' + item.id + ' отменена (' + d.cancelled_by + ')';
+      if (d.notify_time) msg += '. Напоминание про СМС/звонок: ' + d.notify_time;
+      alert(msg);
+      loadResvDay();
+      if (cancelreqQueue.length) showNextCancelReq();
+    })
+    .catch(e => alert('❌ ' + e.message));
+}
+
+// Опрос: конфликты закрытых банкетов + наступившее время уведомления
+setInterval(() => {
+  fetch('/api/reservations/reminders')
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) return;
+      (d.cancel_requests || []).forEach(r => {
+        if (localStorage.getItem('d_cancelreq_' + r.id)) return;
+        if (document.getElementById('cancelreq-overlay').style.display === 'flex') return;
+        localStorage.setItem('d_cancelreq_' + r.id, '1');
+        cancelreqQueue.push(r);
+        showNextCancelReq();
+      });
+      (d.sms_due || []).forEach(r => {
+        const key = 'd_sms_' + r.id;
+        if (localStorage.getItem(key)) return;
+        localStorage.setItem(key, '1');
+        const p = String(r.res_date).split('-');
+        alert('⚠️ ОБЯЗАТЕЛЬНО: СМС затем звонок клиенту (отмена брони)\n' +
+          p[2] + '.' + p[1] + '.' + p[0].slice(2) + '_' + String(r.res_time).slice(0, 5) +
+          '_' + r.table_id + '_' + (r.phone || '') + '_' + (r.guest_name || ''));
+      });
+    })
+    .catch(() => {});
+}, 30000);
+</script>
+  <div id="cancelreq-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1001;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:520px;width:92%;box-shadow:0 8px 24px rgba(0,0,0,0.3)">
+      <h3 style="margin:0 0 10px;color:#dc3545">Отмена брони</h3>
+      <div id="cancelreq-text" style="font-size:14px;font-weight:bold;margin-bottom:10px"></div>
+      <div style="margin-bottom:8px">
+        <label style="display:block;font-size:13px">Инициатор отмены:</label>
+        <label style="font-size:13px"><input type="radio" name="cancelreq-init" value="client" checked onchange="cancelreqToggleTime()"> Клиент</label>
+        <label style="font-size:13px;margin-left:12px"><input type="radio" name="cancelreq-init" value="cafe" onchange="cancelreqToggleTime()"> Кафе</label>
+      </div>
+      <div id="cancelreq-time-row" style="display:none;margin-bottom:8px">
+        <label style="display:block;font-size:13px">Время уведомления (ДД.ММ.ГГ ЧЧ:ММ):</label>
+        <input id="cancelreq-notify" type="datetime-local" style="padding:6px;border:1px solid #dee2e6;border-radius:6px">
+      </div>
+      <label style="display:block;font-size:13px">Личный ПИН (директор 7777 / бармен 4444):</label>
+      <input id="cancelreq-pin" type="password" maxlength="4" style="padding:6px;border:1px solid #dee2e6;border-radius:6px;width:120px">
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button type="button" onclick="document.getElementById('cancelreq-overlay').style.display='none'" style="background:#6c757d;color:#fff;border:none;border-radius:8px;padding:10px 16px">Отмена</button>
+        <button type="button" onclick="cancelreqConfirm()" style="background:#dc3545;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:bold">✅ Подтвердить отмену</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
